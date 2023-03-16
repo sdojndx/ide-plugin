@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <defs>
+    <style>
+      .b {
+        fill: #ececec;
+      }
+    </style>
+  </defs>
+  <path transform="rotate(180 8 8)" style="fill:none" d="M0 0h16v16H0z" />
+  <path class="b"
+    d="M13.789 8.707 9.196 13.3a.99.99 0 0 1-1.4-1.4l3.9-3.9-3.9-3.9a.99.99 0 0 1 1.4-1.4l4.593 4.59a1 1 0 0 1 0 1.414z" />
+  <path class="b"
+    d="M7.789 8.707 3.196 13.3a.99.99 0 0 1-1.4-1.4l3.9-3.9-3.9-3.9a.99.99 0 0 1 1.4-1.4l4.593 4.59a1 1 0 0 1 0 1.414z" />
+</svg>

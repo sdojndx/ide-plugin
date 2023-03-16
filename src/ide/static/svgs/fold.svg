@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <defs>
+    <style>
+      .b {
+        fill: #ececec;
+      }
+    </style>
+  </defs>
+  <path style="fill:none" d="M0 0h16v16H0z" />
+  <path class="b"
+    d="M2.005 7.293 6.598 2.7a.99.99 0 0 1 1.4 1.4L4.098 8l3.9 3.9a.99.99 0 0 1-1.4 1.4L2.005 8.71a1 1 0 0 1 0-1.414z" />
+  <path class="b"
+    d="M8.005 7.293 12.598 2.7a.99.99 0 0 1 1.4 1.4l-3.9 3.9 3.9 3.9a.99.99 0 0 1-1.4 1.4L8.005 8.71a1 1 0 0 1 0-1.414z" />
+</svg>
