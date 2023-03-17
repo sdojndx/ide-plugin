@@ -2,38 +2,28 @@
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ESNext"
-    ],
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,
-    "skipLibCheck": true,
-    "esModuleInterop": false,
-    "allowSyntheticDefaultImports": true,
     "strict": true,
+    "declaration": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
+    "jsx": "react",
+    "baseUrl": "./",
     "paths": {
-      "@ide/*": [
-        "./src/ide/*"
-      ],
-      "@/*": [
-        "./src/*"
-      ],
+      "@ide/*": ["./src/ide/*"],
+      "@/*": ["./src/*"],
+      "@@/*": [".dumi/tmp/*"],
+      "chain_ide_web": ["src"],
+      "chain_ide_web/*": ["src/*", "*"]
     }
   },
-  "include": [
-    "src"
-  ],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    }
-  ]
+  "include": [".dumi/**/*", ".dumirc.ts", "src/**/*"]
 }
