@@ -21,15 +21,18 @@ export interface ResponseIf<T> {
   retCode?: number;
   Error?: string;
 }
-export type ResponseInfo<T> = AxiosResponse<ResponseIf<ResponseData<T> | ResponseList<T> | ResponseError> | any, any>;
+export type ResponseInfo<T> = AxiosResponse<
+  ResponseIf<ResponseData<T> | ResponseList<T> | ResponseError> | any,
+  any
+>;
 export type Fetch<P, T> = (params: P) => Promise<T>;
 
 const instance = axios.create({
   withCredentials: true,
   baseURL: import.meta.env.VITE_API_HOST, // process.env.NODE_ENV === 'production' ? BASEURL : '/chainmaker',
   headers: {
-    withCredentials: true
-  }
+    withCredentials: true,
+  },
 });
 instance.interceptors.request.use((config) => {
   if (!config.headers) {
@@ -71,7 +74,7 @@ instance.interceptors.response.use(
         message.error({ content: '云官网token失效' });
         window.open(
           'https://cloud.tencent.com/open/authorize?scope=login&app_id=100025741174&redirect_url=https%3A%2F%2Fconsole.zxchain.qq.com/auth-info&state=1043',
-          '_self'
+          '_self',
         );
       }
       //   if (reject) {
@@ -87,54 +90,50 @@ instance.interceptors.response.use(
     // resolve(res.data);
     return response.data;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 // 对错误信息进行默认处理的get请求 封装函数
 export const createGetChannel = (url: string): Fetch<any, any> => {
-  return (params?: any, transformResponse?: (resp: ResponseInfo<any>) => void) =>
+  return (
+    params?: any,
+    transformResponse?: (resp: ResponseInfo<any>) => void,
+  ) =>
     instance.get(url, {
       params: { ...params },
-      transformResponse
+      transformResponse,
     });
 };
 // 对错误信息进行默认处理的get请求 封装函数
 export const createGetChannelBlob = (url: string): Fetch<any, any> => {
-  return (params?: any, transformResponse?: (resp: ResponseInfo<any>) => void) =>
+  return (
+    params?: any,
+    transformResponse?: (resp: ResponseInfo<any>) => void,
+  ) =>
     instance.get(url, {
       params: { ...params },
       transformResponse,
-      responseType: 'blob'
+      responseType: 'blob',
     });
 };
 
 // 对错误信息进行默认处理的post请求 封装函数
 export const createPostChannel = (url: string): Fetch<any, any> => {
   return (data?: any) =>
-    instance.post(
-      url,
-      {
-        ...data
-      }
-    );
+    instance.post(url, {
+      ...data,
+    });
 };
 // 对错误信息进行默认处理的post formData请求 封装函数
 export const createPostFormDataChannel = (url: string): Fetch<any, any> => {
   return (data?: any) =>
-    instance.post(
-      url,
-      data,
-      {
-        headers: { 'content-type': 'application/x-www-form-urlencoded' }
-      }
-    );
+    instance.post(url, data, {
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    });
 };
 // 单纯处理的post请求 的封装函数
 export const createPostFetch = (url: string): Fetch<any, any> => {
   return (data: any) =>
-    axios.post(
-      url,
-      {
-        ...data
-      }
-    );
+    axios.post(url, {
+      ...data,
+    });
 };

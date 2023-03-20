@@ -9,10 +9,10 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc && vite build",
+    "build:demo": "tsc && vite build",
     "build:dumi": "father build",
     "build:watch": "father dev",
-    "dev": "vite",
+    "dev:demo": "vite",
     "dev:dumi": "dumi dev",
     "docs:build": "dumi build",
     "doctor": "father doctor",

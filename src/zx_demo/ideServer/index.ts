@@ -1,21 +1,50 @@
-
 import {
-  BuildContractParam, CompileContractParam, RunContractParam,
-  PreferenceRequest, AutocomplateRequest, SaveParam, BuildParam,
-  FmtParam, RenameFileParam, DeclParam, IdeServer
+  AutocomplateRequest,
+  BuildContractParam,
+  BuildParam,
+  CompileContractParam,
+  DeclParam,
+  FmtParam,
+  IdeServer,
+  PreferenceRequest,
+  RenameFileParam,
+  RunContractParam,
+  SaveParam,
 } from '@ide/types/ideServer';
 import { TreeItem } from '@ide/types/tree';
 import {
-  contractCompile, contractHasBuild, contractInvokeAll,
-  contractMethod, contractNames, contractRunBuild, files,
-  index, deployContractList, getContractFile, deployContract,
-  hasDeployContractList, newFile, preference, removeFile,
-  renameFile, pullnotify, file, saveFile, outline, autocomplete,
-  newContract, build, fmt, goModuleFiles, importFiles, decl, exportFile
+  autocomplete,
+  build,
+  contractCompile,
+  contractHasBuild,
+  contractInvokeAll,
+  contractMethod,
+  contractNames,
+  contractRunBuild,
+  decl,
+  deployContract,
+  deployContractList,
+  exportFile,
+  file,
+  files,
+  fmt,
+  getContractFile,
+  goModuleFiles,
+  hasDeployContractList,
+  importFiles,
+  index,
+  newContract,
+  newFile,
+  outline,
+  preference,
+  pullnotify,
+  removeFile,
+  renameFile,
+  saveFile,
 } from '../api';
 
 function formatTree(files: any[]): TreeItem[] {
-  return files.map(item => {
+  return files.map((item) => {
     const { name, type, children, path, isGOAPI } = item;
     return {
       id: name + path,
@@ -24,20 +53,21 @@ function formatTree(files: any[]): TreeItem[] {
       type: type === 'f' ? 'file' : 'folder',
       path,
       editable: !isGOAPI,
-      children: children.length ? formatTree(children) : undefined
+      children: children.length ? formatTree(children) : undefined,
     };
   });
 }
 
 const config = {
-  pluginDownloadPage: 'https://zxchain-wallet-1258344699.cos.ap-nanjing.myqcloud.com/chrome-extensions/debug/zxchain_wallet_chrome_extension_http.zip',
-  requestPath: import.meta.env.VITE_API_HOST
+  pluginDownloadPage:
+    'https://zxchain-wallet-1258344699.cos.ap-nanjing.myqcloud.com/chrome-extensions/debug/zxchain_wallet_chrome_extension_http.zip',
+  requestPath: import.meta.env.VITE_API_HOST,
 };
 
 const timer: {
-  [key: string]: any
+  [key: string]: any;
 } = {
-  output: undefined
+  output: undefined,
 };
 
 const server: IdeServer = {
@@ -51,7 +81,10 @@ const server: IdeServer = {
     }
     // return Promise.all([index({}),files({"hash":"","contractName":"nft"})])
   },
-  getContractFiles: async (params: { contractName?: string; includeApi: boolean }) => {
+  getContractFiles: async (params: {
+    contractName?: string;
+    includeApi: boolean;
+  }) => {
     const data = await files(params);
     if (data.retCode === 0 && data?.data) {
       return formatTree(data.data.children);
@@ -75,10 +108,7 @@ const server: IdeServer = {
       throw new Error(data.retMsg);
     }
   },
-  newFile: async (param: {
-    path?: string;
-    fileType?: 'd' | 'f'
-  }) => {
+  newFile: async (param: { path?: string; fileType?: 'd' | 'f' }) => {
     const data = await newFile(param);
     if (data.retCode === 0) {
       return data.data;
@@ -108,7 +138,7 @@ const server: IdeServer = {
   },
   removeFile: async (path: string) => {
     const data = await removeFile({
-      path
+      path,
     });
     if (data.retCode === 0) {
       return data.data;
@@ -248,7 +278,7 @@ const server: IdeServer = {
         type: item.type || 'constant',
         label: item.name,
         detail: item.class,
-        info: item.package
+        info: item.package,
       }));
     }
     return [];
@@ -290,7 +320,9 @@ const server: IdeServer = {
     }
   },
   getDownloadPath: async (name: string) => {
-    return `${import.meta.env.VITE_API_HOST}api/v1/ide/file/getContractFile?path=${name}`;
-  }
+    return `${
+      import.meta.env.VITE_API_HOST
+    }api/v1/ide/file/getContractFile?path=${name}`;
+  },
 };
 export default server;

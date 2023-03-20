@@ -13,17 +13,55 @@ TODO
 
 TODO
 
+ <!-- "build:demo": "tsc && vite build",
+    "build:dumi": "father build",
+    "build:watch": "father dev",
+    "dev:demo": "vite",
+    "dev:dumi": "dumi dev",
+    "docs:build": "dumi build",
+    "doctor": "father doctor",
+    "lint": "npm run lint:es && npm run lint:css",
+    "lint:css": "stylelint \"{src,test}/**/*.{css,less}\"",
+    "lint:es": "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
+    "prepare": "husky install && dumi setup",
+    "prepublishOnly": "father doctor && npm run build",
+    "preview": "vite preview",
+    "start": "npm run dev:dumi" -->
+
 ## Development
 
 ```bash
-# install dependencies
+# 打包ide demo的生产环境包
+$ npm run build:demo
+# 打包ide 的dumi文档
+$ npm run build:dumi
+#
+$ npm run
+#
+$ npm run
+#
+$ npm run
+#
+$ npm run
+#
+$ npm run
+#
+$ npm run
+#
+$ npm run
+#
+$ npm run
+#
+$ npm run
+
+# 按照依赖包
 $ npm install
 
-# develop library by docs demo
+# 启动开发dumi文档
 $ npm start
 
 # build library source code
-$ npm run build
+$ npm run build:dumi
 
 # build library source code in watch mode
 $ npm run build:watch
