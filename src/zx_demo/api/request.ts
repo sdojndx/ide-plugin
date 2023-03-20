@@ -36,7 +36,7 @@ const instance = axios.create({
 });
 instance.interceptors.request.use((config) => {
   if (!config.headers) {
-    config.headers = {};
+    config.headers = {} as any;
   }
   (config.headers as any)['Cloud-Trace-Id'] = uuidv4();
   return config;
