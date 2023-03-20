@@ -1,5 +1,5 @@
-import logo from '@/assets/svgs/logo.svg';
-import Ide from '@/ide';
+import logo from '../assets/svgs/logo.svg';
+import Ide from '@ide/index';
 import { IdeSetting } from '@ide/store/settingStore';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { message } from 'tea-component';

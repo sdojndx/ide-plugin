@@ -74,3 +74,12 @@ zxchain-ide
 * ctrl+h： 向左删除
 * ctrl+k： 删除光标右侧本行内容
 * ctrl+o： 光标后方内容拆分到新行
+
+## CI配置
+
+``` shell
+
+# 构建包 
+$ npm run build
+
+```

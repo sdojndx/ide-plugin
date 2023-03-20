@@ -1,12 +1,20 @@
 {
-  "name": "zxchain-ide",
+  "name": "ide_plugin",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "files": ["dist"],
+  "main": "./dist/ide_plugin.umd.cjs",
+  "module": "./dist/ide_plugin.js",
+  "exports": {
+    ".": {
+      "import": "./dist/ide_plugin.js",
+      "require": "./dist/ide_plugin.umd.cjs"
+    }
+  },
   "scripts": {
-    "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview",
+    "test": "vite",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
