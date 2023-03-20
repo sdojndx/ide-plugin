@@ -88,6 +88,11 @@ $ npm run build
 #
 $ npm run test
 
+# 启动文档开发
+$ npm run storybook
 
+
+# 打包文档
+$ npm run build-storybook
 
 ```
