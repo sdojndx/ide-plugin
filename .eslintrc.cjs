@@ -3,7 +3,7 @@ module.exports = {
     browser: true,
     es2021: true
   },
-  extends: ['plugin:react/recommended', 'standard'],
+  extends: ['plugin:react/recommended', 'standard', 'plugin:storybook/recommended'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaFeatures: {
@@ -17,20 +17,14 @@ module.exports = {
     indent: 'off',
     '@typescript-eslint/indent': ['error', 2, {
       SwitchCase: 1
-
     }],
     'space-before-function-paren': 0,
     semi: ['error', 'always'],
     '@typescript-eslint/semi': ['error', 'always'],
     '@typescript-eslint/no-unused-vars': 'error',
     '@typescript-eslint/naming-convention': ['warn', {
-      selector: [
-        'class',
-        'typeLike'
-      ],
-      format: [
-        'PascalCase'
-      ]
+      selector: ['class', 'typeLike'],
+      format: ['PascalCase']
     }],
     '@typescript-eslint/brace-style': 'error'
   }
