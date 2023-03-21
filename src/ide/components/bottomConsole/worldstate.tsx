@@ -85,7 +85,6 @@ export default function IDEWorldState({ style }: {
   const inputHandler = useCallback((type: 'key' | 'value', value: string, index: number) => {
     if (contract && contract.contractName) {
       if (type === 'key') {
-        console.log('tree: ', tree);
         if (value && tree[contract.contractName][value]) {
           setModalStatus({
             modalShow: true,

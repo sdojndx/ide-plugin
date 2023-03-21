@@ -6,7 +6,10 @@ const lineUUIDs: any = {};
 export default function IDEOutputs({ style }: {
   style?: React.CSSProperties;
 }) {
-  const { outputText, setOutputText, setOriginOutputText, openEditor, updateEditor, updateAllEditor, updateLints } = useIdeStore();
+  const {
+    outputText, setOutputText, setOriginOutputText, openEditor, removeEditor,
+    updateEditor, updateAllEditor, updateLints, getFiles
+  } = useIdeStore();
   const { server } = useIdeStore();
   const { setCurrentTab } = useIdeStore();
 
@@ -24,7 +27,6 @@ export default function IDEOutputs({ style }: {
       switch (data.cmd) {
         case 'build':
           if (data.lints) {
-            // console.log(data)
             const linemap: any = {};
             data.lints.forEach((lint: any) => {
               if (!linemap[lint.file]) {
@@ -51,6 +53,19 @@ export default function IDEOutputs({ style }: {
               type: 'update',
               v: new Date().getTime()
             }
+          });
+          break;
+        case 'create-file':
+          getFiles();
+          break;
+        case 'remove-file':
+          getFiles();
+          removeEditor(data.path);
+          break;
+        case 'rename-file':
+          getFiles();
+          updateEditor(data.path, {
+            path: data.newPath
           });
           break;
         default:

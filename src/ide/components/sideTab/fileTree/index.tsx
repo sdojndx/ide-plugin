@@ -9,6 +9,8 @@ import { Modal } from 'tea-component/lib/modal/Modal';
 import { message } from 'tea-component';
 import useIdeStore from '@ide/store';
 
+const supportFileType = ['go', 'mod', 'sum', 'js', 'ts'];
+
 function TreePopover({ item }: { item: TreeItem }) {
   const [visible, setVisible] = useState(false);
   const { setAddFileInfo, setModalStatus } = useIdeStore();
@@ -43,7 +45,7 @@ function TreePopover({ item }: { item: TreeItem }) {
     if (item.type === 'file') {
       event?.preventDefault();
       const type = item.path.match(/[^.]+$/)?.[0];
-      if (type === 'go' || type === 'mod' || type === 'sum' || type === 'js' || type === 'ts') {
+      if (type && supportFileType.indexOf(type) > -1) {
         openEditor({
           path: item.path,
           name: item.name
@@ -85,7 +87,7 @@ function TreePopover({ item }: { item: TreeItem }) {
     overlay={
       <DropdownBox>
         <List type="option" className="popover-list">
-          {item.type !== 'file' && <List.Item
+          {item.type !== 'file' && item.creatable === true && <List.Item
             onClick={(e) => {
               e.stopPropagation();
               setAddFileInfo({
@@ -99,13 +101,13 @@ function TreePopover({ item }: { item: TreeItem }) {
           >
             创建文件
           </List.Item>}
-          {item.type !== 'file' && <List.Item
+          {item.type !== 'file' && item.creatable === true && <List.Item
             onClick={(e) => {
               e.stopPropagation();
               setAddFileInfo({
                 isOpenAddFile: true,
                 newFilePath: item.path,
-                newFileName: item.name,
+                newFileName: '',
                 addFileType: 'folder'
               });
               setVisible(false);
@@ -113,7 +115,7 @@ function TreePopover({ item }: { item: TreeItem }) {
           >
             创建文件夹
           </List.Item>}
-          <List.Item
+          {item.type === 'folder' || < List.Item
             onClick={(e) => {
               e.stopPropagation();
               openFile();
@@ -121,17 +123,18 @@ function TreePopover({ item }: { item: TreeItem }) {
             }}
           >
             打开
-          </List.Item>
-          <List.Item
-            onClick={(e) => {
-              e.stopPropagation();
-              removeFile();
-              setVisible(false);
-            }}
-          >
-            删除
-          </List.Item>
-          <List.Item
+          </List.Item>}
+          {item.removable === false ||
+            <List.Item
+              onClick={(e) => {
+                e.stopPropagation();
+                removeFile();
+                setVisible(false);
+              }}
+            >
+              删除
+            </List.Item>}
+          {item.removable === false || <List.Item
             onClick={(e) => {
               e.stopPropagation();
               setAddFileInfo({
@@ -144,26 +147,19 @@ function TreePopover({ item }: { item: TreeItem }) {
             }}
           >
             重命名
-          </List.Item>
-          {/* <li className='line-space'></li>
-          <List.Item
-            onClick={(e) => {
-              e.stopPropagation()
-              setVisible(false)
-            }}
-          >
-            刷新
-          </List.Item> */}
-          <li className='line-space'></li>
-          <List.Item
-            onClick={(e) => {
-              e.stopPropagation();
-              exportFile();
-              setVisible(false);
-            }}
-          >
-            导出
-          </List.Item>
+          </List.Item>}
+          {item.editable === false || <>
+            <li className='line-space'></li>
+            <List.Item
+              onClick={(e) => {
+                e.stopPropagation();
+                exportFile();
+                setVisible(false);
+              }}
+            >
+              导出
+            </List.Item>
+          </>}
         </List>
       </ DropdownBox>
     }

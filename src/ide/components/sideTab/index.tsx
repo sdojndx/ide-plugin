@@ -7,6 +7,9 @@ import FileTree from './fileTree';
 import fold from '@ide/static/svgs/fold.svg';
 import addfile from '@ide/static/svgs/addfile.svg';
 import useIdeStore from '@ide/store';
+import { FileTypes } from '@ide/utils/menu';
+
+const accept = FileTypes.map(item => `.${item}`);
 export default function SideTab() {
   const { activeTab, setIsHideNav, setModalStatus } = useIdeStore();
   const fileInput = useRef<HTMLInputElement | null>(null);
@@ -91,7 +94,7 @@ export default function SideTab() {
           type="file"
           onChange={importFile}
           multiple
-          accept={['.go', '.txt', '.md', '.mod', '.sum', '.java', '.sol', '.crt', '.key', '.yml'].join(',')}
+          accept={accept.join(',')}
           className="upload-files"
           style={{ width: 0, height: 0, opacity: 0 }} />
       </div>

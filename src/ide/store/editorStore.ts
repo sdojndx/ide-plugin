@@ -77,8 +77,23 @@ export type EditorStore = EditorData & {
   setEditors: (ls: EditorItemProp[]) => void;
   updateEditor: (path: string, item: EditorItemPartial) => void;
   updateAllEditor: (item: Pick<EditorItem, 'lints'>) => void;
+  /**
+   * 打开并切换当前编辑文件
+   * @param item 节点信息
+   * @returns
+   */
   openEditor: (item: EditorItem) => void;
+  /**
+   * 移除编辑中的某个文件节点tab
+   * @param item 移除的节点信息
+   * @returns
+   */
   removeEditor: (path: string) => void;
+  /**
+   * 设置当前选中的目录树节点
+   * @param item 选中节点信息
+   * @returns
+   */
   setActiveTreeNode: (item: EditorItem) => void;
   updateLints: (item: EditorData['lints']) => void;
 };
@@ -105,7 +120,6 @@ export const editorStore: StateCreator<EditorStore> = (set) => ({
     ...state,
     editors: ls
   })),
-  // 打开并切换当前编辑文件
   openEditor: (item) => set((state) => {
     const editorlist = state.editors;
     const history = state.history.slice();

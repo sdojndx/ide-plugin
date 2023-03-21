@@ -1,5 +1,5 @@
 import { EditorItem } from '@ide/store/editorStore';
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from 'tea-component/lib/icon/Icon';
 import maximum from '@ide/static/images/maximum.png';
 import restore from '@ide/static/images/restore.png';
@@ -14,9 +14,11 @@ export default function CodeEditor() {
   const { setting } = useIdeStore();
   const {
     editors, setEditors, removeEditor, openEditor, updateIdeSetting,
-    contract, userId,
+    contract, userId, files,
     isHideNav, isHideFunc, isHideBottom, setIsHideBottom, setIsHideFunc, setIsHideNav
   } = useIdeStore();
+  // 初始化编辑文件选项
+  const [initEditer, setInitEditer] = useState(false);
   const refs = useRef<any[]>([]);
 
   const isFull = useMemo(() => {
@@ -89,6 +91,22 @@ export default function CodeEditor() {
     }
     setEditors(JSON.parse(localStorage.getItem(`${userId}_${contract?.contractName}_editors`) || '[]'));
   }, [contract?.contractName, userId]);
+
+  useEffect(() => {
+    console.log(files);
+    if (initEditer) {
+      return;
+    }
+    if (files.length > 0) {
+      setInitEditer(true);
+      if (editors.length === 0) {
+        const mainNode = files[0].children?.find(node => node.name === 'main.go');
+        if (mainNode) {
+          openEditor({ path: mainNode.path });
+        }
+      }
+    }
+  }, [files, editors, initEditer]);
   return <div className='code_editor'>
     <div className='code_nav'>
       <div className='code_nav_l'>

@@ -49,3 +49,7 @@ export const MENU_LIST: Array<MenuItem> = [{
   active: setup,
   type: 'set'
 }];
+
+export const FileTypes: string[] = [
+  'go', 'txt', 'md', 'mod', 'sum', 'java', 'sol', 'crt', 'pem', 'key', 'yml'
+];

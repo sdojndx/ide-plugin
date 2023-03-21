@@ -146,7 +146,6 @@ export default function ContractDeploy({ style }: {
   // 项目名称
   useEffect(() => {
     if (contract?.contractName) {
-      // console.log('====contract', contract)
       setProjectName(contract.contractName);
       setBuildTime(projectNameRelate[contract.contractName]?.buildTime);
     }
@@ -262,7 +261,6 @@ export default function ContractDeploy({ style }: {
             options={projectNameOptions ? projectNameOptions.map((item: DeployContractListResponse) => ({ value: item.contractName, text: item.projectName })) : []}
             value={projectName}
             onChange={(value) => {
-              console.log('value: ', value);
               setProjectName(value);
               setBuildTime(projectNameRelate[value].buildTime);
             }}

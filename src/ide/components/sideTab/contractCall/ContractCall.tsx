@@ -105,7 +105,6 @@ export default function ContractCall({ style }: {
           setCallContractResult('合约执行失败');
           setOutputText('<span class="notification-error">' + ac + ' [' + name + ' ' + method + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' ' + JSON.stringify(error) + '</span>');
         });
-        console.log('调用合约：唤起插件');
         setOutputText('<span class="notification-run">' + ac + ' [' + name + ' ' + method + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' 插件已唤起，请在插件上选择网络/账户发起上链请求</span>');
       } catch (error) {
         setOutputText('<span class="notification-error">' + ac + ' [' + name + ' ' + method + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' ' + JSON.stringify(error) + '</span>');

@@ -1,34 +1,11 @@
-import {
-  autocompletion,
-  closeBrackets,
-  closeBracketsKeymap,
-  completionKeymap,
-} from '@codemirror/autocomplete';
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
-import {
-  bracketMatching,
-  defaultHighlightStyle,
-  foldGutter,
-  foldKeymap,
-  indentOnInput,
-  syntaxHighlighting,
-} from '@codemirror/language';
-import { lintKeymap } from '@codemirror/lint';
-import { highlightSelectionMatches, searchKeymap } from '@codemirror/search';
+import { lineNumbers, highlightActiveLineGutter, highlightSpecialChars, drawSelection, dropCursor, rectangularSelection, crosshairCursor, highlightActiveLine, keymap } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
-import {
-  crosshairCursor,
-  drawSelection,
-  dropCursor,
-  highlightActiveLine,
-  highlightActiveLineGutter,
-  highlightSpecialChars,
-  keymap,
-  lineNumbers,
-  rectangularSelection,
-} from '@codemirror/view';
+import { foldGutter, indentOnInput, syntaxHighlighting, defaultHighlightStyle, bracketMatching, foldKeymap } from '@codemirror/language';
+import { history, defaultKeymap, historyKeymap } from '@codemirror/commands';
+import { highlightSelectionMatches, searchKeymap } from '@codemirror/search';
+import { closeBrackets, autocompletion, closeBracketsKeymap, completionKeymap } from '@codemirror/autocomplete';
+import { lintKeymap } from '@codemirror/lint';
 export { EditorView } from '@codemirror/view';
-export { basicSetup };
 
 const basicSetup = (() => [
   lineNumbers(),
@@ -55,6 +32,8 @@ const basicSetup = (() => [
     ...historyKeymap,
     ...foldKeymap,
     ...completionKeymap,
-    ...lintKeymap,
-  ]),
+    ...lintKeymap
+  ])
 ])();
+
+export { basicSetup };

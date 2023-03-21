@@ -10,4 +10,6 @@ export interface TreeItem {
   icon?: React.ReactNode | string | TreeIcon;
   path: string;
   editable?: boolean;
+  creatable?: boolean;
+  removable?: boolean;
 }

@@ -15,7 +15,9 @@ interface ContractData {
   };
   // action?: number;
   refreshFiles: boolean;
+  // 合约本身的文件目录
   files: TreeItem[];
+  // 合约依赖的文件目录
   modelFiles: TreeItem[];
   fileTree: TreeItem[];
   userId: string | number;
