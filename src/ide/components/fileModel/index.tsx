@@ -46,9 +46,8 @@ const FileModel = React.forwardRef(() => {
           //   path: newPath
           // })
           close();
-        }).catch((e) => {
+        }).catch(() => {
           setLoading(false);
-          message.error({ content: e.message });
         });
       } else {
         const path = addFileInfo.newFilePath + '/' + addFileInfo.newFileName;
@@ -62,9 +61,8 @@ const FileModel = React.forwardRef(() => {
             openEditor({ path });
           }
           close();
-        }).catch((e) => {
+        }).catch(() => {
           setLoading(false);
-          message.error({ content: e.message });
         });
       }
     }

@@ -8,8 +8,7 @@ import { List } from 'tea-component/lib/list/List';
 import { Modal } from 'tea-component/lib/modal/Modal';
 import { message } from 'tea-component';
 import useIdeStore from '@ide/store';
-
-const supportFileType = ['go', 'mod', 'sum', 'js', 'ts'];
+import { FileTypes } from '@ide/utils/menu';
 
 function TreePopover({ item }: { item: TreeItem }) {
   const [visible, setVisible] = useState(false);
@@ -36,8 +35,6 @@ function TreePopover({ item }: { item: TreeItem }) {
       server?.removeFile?.(item.path).then(() => {
         getFiles();
         removeEditor(item.path);
-      }).catch(e => {
-        message.error({ content: e.message });
       });
     }
   }, [server]);
@@ -45,7 +42,7 @@ function TreePopover({ item }: { item: TreeItem }) {
     if (item.type === 'file') {
       event?.preventDefault();
       const type = item.path.match(/[^.]+$/)?.[0];
-      if (type && supportFileType.indexOf(type) > -1) {
+      if (type && FileTypes.indexOf(type) > -1) {
         openEditor({
           path: item.path,
           name: item.name

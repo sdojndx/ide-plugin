@@ -1,18 +1,25 @@
 import useIdeStore from '@ide/store';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Button } from 'tea-component';
+import { Contract } from '@ide/types/contract';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Button, Select } from 'tea-component';
 
 export default function IDEWorldState({ style }: {
   style?: React.CSSProperties;
 }) {
-  const { contract } = useIdeStore();
+  const { contract, server } = useIdeStore();
+  const [constracts, setContracts] = useState<Contract[]>([]);
+  const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
   const { worldState, unshiftWorldState, setWorldState } = useIdeStore();
   const [tree, setTree] = useState<{ [key: string]: { [keys: string]: any[] } }>({});
   const [contractTreeData, setContractTreeData] = useState<{ [keys: string]: any[] }>({});
   const [openStatus, setOpenStatus] = useState<boolean[]>([]);
   const { setModalStatus } = useIdeStore();
   const keyInputRef = useRef<HTMLTextAreaElement>(null);
-
+  // 获取合约名称列表
+  const getContractName = useCallback(async () => {
+    const data = await server?.getContractNames();
+    setContracts(data);
+  }, [server]);
   const createTree = useCallback(() => {
     const treeTemp: { [key: string]: { [keys: string]: any[] } } = {};
     if (worldState.length) {
@@ -43,8 +50,8 @@ export default function IDEWorldState({ style }: {
   }, [worldState]);
 
   const addData = useCallback((type?: string) => {
-    if (contract && contract.contractName) {
-      const list = tree[contract.contractName];
+    if (selectedContract && selectedContract.contractName) {
+      const list = tree[selectedContract.contractName];
 
       if (list) {
         let count = 0;
@@ -62,17 +69,17 @@ export default function IDEWorldState({ style }: {
         }
       }
 
-      unshiftWorldState({ key: `${contract.contractName}##0`, value: '' });
+      unshiftWorldState({ key: `${selectedContract.contractName}##0`, value: '' });
       return true;
     }
-  }, [worldState, contract, tree]);
+  }, [worldState, selectedContract, tree]);
 
   const deleteData = useCallback((key: string, index: number) => {
     if (!key) {
       setWorldState(worldState.filter((_, idx) => idx !== index));
     } else {
-      if (contract && contract.contractName && Object.keys(tree).length !== 0) {
-        const list = tree[contract.contractName][key];
+      if (selectedContract && selectedContract.contractName && Object.keys(tree).length !== 0) {
+        const list = tree[selectedContract.contractName][key];
         let tempList = worldState;
         list.forEach((item) => {
           tempList = tempList.filter((state) => state.key !== item.key);
@@ -80,12 +87,12 @@ export default function IDEWorldState({ style }: {
         setWorldState(tempList);
       }
     }
-  }, [worldState, tree, contract]);
+  }, [worldState, tree, selectedContract]);
 
   const inputHandler = useCallback((type: 'key' | 'value', value: string, index: number) => {
-    if (contract && contract.contractName) {
+    if (selectedContract && selectedContract.contractName) {
       if (type === 'key') {
-        if (value && tree[contract.contractName][value]) {
+        if (value && tree[selectedContract.contractName][value]) {
           setModalStatus({
             modalShow: true,
             modalContent: '输入的属性不能重复哦！'
@@ -96,7 +103,7 @@ export default function IDEWorldState({ style }: {
           if (idx === index) {
             return {
               ...item,
-              key: `${contract.contractName}#${value}#0`
+              key: `${selectedContract.contractName}#${value}#0`
             };
           }
           return item;
@@ -113,7 +120,7 @@ export default function IDEWorldState({ style }: {
         }));
       }
     }
-  }, [worldState, contract, keyInputRef, tree]);
+  }, [worldState, selectedContract, keyInputRef, tree]);
 
   const openDetail = (e: React.MouseEvent, index: number) => {
     e?.preventDefault();
@@ -124,23 +131,43 @@ export default function IDEWorldState({ style }: {
       return item;
     }));
   };
+  const contractOptions = useMemo(() => {
+    // return constracts.filter((contract) => {
+    //   if (contract?.contractName) {
+    //     return !!tree[contract.contractName];
+    //   } else {
+    //     return false;
+    //   }
+    // }).map((contract) => ({ value: contract?.projectName || '', text: contract?.projectName }));
+    return constracts.map((contract) => ({ value: contract?.projectName || '', text: contract?.projectName }));
+  }, [constracts, tree]);
 
   useEffect(() => {
-    if (worldState.length === 0) {
+    if (worldState.length === 0 && contract.contractName) {
       setWorldState([{ key: `${contract.contractName}##0`, value: '' }]);
     }
     createTree();
-  }, [createTree, worldState]);
+  }, [createTree, contract]);
 
   useEffect(() => {
-    if (contract && contract.contractName && Object.keys(tree).length !== 0) {
-      if (tree[contract.contractName]) {
-        setContractTreeData(tree[contract.contractName]);
+    if (Object.keys(tree).length !== 0) {
+      if (selectedContract && selectedContract.contractName) {
+        if (tree[selectedContract.contractName]) {
+          setContractTreeData(tree[selectedContract.contractName]);
+        } else {
+          unshiftWorldState({ key: `${selectedContract.contractName}##0`, value: '' });
+        }
       } else {
-        unshiftWorldState({ key: `${contract.contractName}##0`, value: '' });
+        // const keys = Object.keys(tree);
+        // setContractTreeData(keys.reduce((ls, item) => {
+        //   if (item) {
+        //     return [...ls, ...tree[item]];
+        //   }
+        //   return ls;
+        // }, []));
       }
     }
-  }, [contract, tree]);
+  }, [selectedContract, tree]);
 
   useEffect(() => {
     if (contract && contract.contractName && Object.keys(tree).length !== 0) {
@@ -151,10 +178,37 @@ export default function IDEWorldState({ style }: {
       }
     }
   }, [contract, tree]);
+  useEffect(() => {
+    setSelectedContract(contract);
+  }, [contract]);
+  useEffect(() => {
+    if (style?.display === 'block') {
+      getContractName();
+    }
+  }, [style?.display]);
 
   return (
     <div className="worldstate" style={style}>
       <div className="button-list">
+        <div className='button-form-item'>
+          <div className='button-form-label'>项目名称：</div>
+          <Select
+            className="set-height"
+            size="full"
+            matchButtonWidth
+            searchable
+            appearance="button"
+            options={contractOptions}
+            value={selectedContract?.projectName}
+            onChange={(value) => {
+              if (value !== '全部') {
+                setSelectedContract(constracts.find(item => item.projectName === value) || null);
+              } else {
+                setSelectedContract(null);
+              }
+            }}
+          />
+        </div>
         <Button type='primary' onClick={() => addData()}>新增</Button>
       </div>
       <div className="worldstate-form">
@@ -182,8 +236,8 @@ export default function IDEWorldState({ style }: {
           }
           {
             contractTreeData.keys && contractTreeData.keys.map((key, idx) => {
-              const list = contractTreeData[key].sort((a, b) => b.version - a.version);
               if (key !== '') {
+                const list = contractTreeData[key].sort((a, b) => b.version - a.version);
                 return (
                   <div className="cont" key={idx}>
                     <div className={`cont-list ${openStatus[idx] && 'open'}`} onDoubleClick={(e) => openDetail(e, idx)}>
@@ -195,16 +249,17 @@ export default function IDEWorldState({ style }: {
                                 ? (
                                   <>
                                     <div className="flex2 key-withbtn">
-                                      {key}{index === 0 && (<div className="open-btn" onClick={(e) => openDetail(e, idx)}></div>)}
+                                      <div className='flex1'>{key}</div>
+                                      <div className="open-btn" onClick={(e) => openDetail(e, idx)}></div>
                                     </div>
-                                    <textarea className="flex3" defaultValue={currentValue.value} onBlur={(e) => inputHandler('value', e.target.value, currentValue.index)}></textarea>
+                                    <textarea className="flex3" value={currentValue.value} onChange={(e) => inputHandler('value', e.target.value, currentValue.index)}></textarea>
                                   </>
 
                                 )
                                 : (
                                   <>
                                     <div className="flex2 key-withbtn">
-                                      {key}
+                                      <div className='flex1'>{key}</div>
                                     </div>
                                     <div className="flex3">{currentValue.value}</div>
                                   </>

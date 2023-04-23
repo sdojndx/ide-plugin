@@ -8,15 +8,16 @@ import {
   notification,
   Switch
 } from 'tea-component';
-import { KeyValueList, KeyValueItem, LIST_INIT, dateFormatNotification } from '../contractDeploy/ContractDeploy';
+import { KeyValueList, KeyValueItem, dateFormatNotification } from '../contractDeploy/ContractDeploy';
 import { HasDeployContractListResponse } from '@ide/types/ideServer';
 import useIdeStore from '@ide/store';
 import { ExecResult } from '../components/ExecResult';
+import { getContractOptionText } from '@ide/utils/tools';
 
 export default function ContractCall({ style }: {
   style?: React.CSSProperties;
 }) {
-  const { setOutputText, contract } = useIdeStore();
+  const { setOriginOutputText, contract } = useIdeStore();
   const [contractAddress, setContractAddress] = useState('');
   const [customAddress, setCustomAddress] = useState('');
   const [contractMethod, setContractMethod] = useState('');
@@ -28,7 +29,7 @@ export default function ContractCall({ style }: {
   const { server } = useIdeStore();
   const [contractMethodRelate, setContractMethodRelate] = useState<{ [x: string]: HasDeployContractListResponse['methods'] }>({});
   // const [submit, setSubmit] = useState(false);
-  const [extraList, setExtraList] = useState(LIST_INIT);
+  const [extraList, setExtraList] = useState([{ key: '', value: '' }]);
 
   useEffect(() => {
     // 获取合约列表
@@ -41,24 +42,21 @@ export default function ContractCall({ style }: {
   const queryHasDeployContractList = useCallback(async () => {
     const result = await server?.hasDeployContractList();
     setContractOption(result);
-    if (contract.contractName && result.filter((item: any) => item.contractName === contract.contractName).length) {
-      setContractAddress(contract.contractName);
+    const currentContract = result.filter((item: any) => item.contractName === contract.contractName);
+    if (contract.contractName && currentContract.length) {
+      setContractAddress(currentContract[0].contractAddr);
     } else {
-      setContractAddress(result?.[0]?.contractName);
+      setContractAddress(result?.[0]?.contractAddr);
     }
     setContractMethodRelate(result.reduce((prev: { [x: string]: HasDeployContractListResponse['methods'] }, val: HasDeployContractListResponse) => {
-      prev[val.contractName] = val.methods;
+      prev[val.contractAddr] = val.methods;
       return prev;
     }, {}));
   }, [server]);
 
   // 重置数据
   const resetHandle = () => {
-    setContractAddress('');
-    setCustomAddress('');
-    setContractMethod('');
-    setCustomMethod('');
-    setExtraList(LIST_INIT);
+    setExtraList([{ key: '', value: '' }]);
   };
   useEffect(() => {
     setMethodOption(contractMethodRelate?.[contractAddress]);
@@ -96,18 +94,18 @@ export default function ContractCall({ style }: {
           }
         }).then((res) => {
           setCallContractResult('合约执行成功');
-          setOutputText('<span class="notification-succ">' + ac + ' [' + name + ' ' + method + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' ' + JSON.stringify(res) + '</span>');
+          setOriginOutputText('<span class="notification-succ">' + ac + ' [' + name + ' ' + method + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' ' + JSON.stringify(res) + '</span>');
         }).catch((error: any) => {
           notification.error({
             title: error,
             description: error
           });
           setCallContractResult('合约执行失败');
-          setOutputText('<span class="notification-error">' + ac + ' [' + name + ' ' + method + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' ' + JSON.stringify(error) + '</span>');
+          setOriginOutputText('<span class="notification-error">' + ac + ' [' + name + ' ' + method + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' ' + JSON.stringify(error) + '</span>');
         });
-        setOutputText('<span class="notification-run">' + ac + ' [' + name + ' ' + method + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' 插件已唤起，请在插件上选择网络/账户发起上链请求</span>');
+        setOriginOutputText('<span class="notification-run">' + ac + ' [' + name + ' ' + method + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' 插件已唤起，请在插件上选择网络/账户发起上链请求</span>');
       } catch (error) {
-        setOutputText('<span class="notification-error">' + ac + ' [' + name + ' ' + method + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' ' + JSON.stringify(error) + '</span>');
+        setOriginOutputText('<span class="notification-error">' + ac + ' [' + name + ' ' + method + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' ' + JSON.stringify(error) + '</span>');
         notification.error({
           title: '插件调用出错',
           description: error as any
@@ -118,9 +116,13 @@ export default function ContractCall({ style }: {
         server?.pluginRequest({
           method: 'zx_webConnect',
           params: {}
+        }).then((res) => {
+          setOriginOutputText('<span class="notification-succ">' + ac + ' [' + name + ' ' + method + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' 连接插件 ' + JSON.stringify(res) + '</span>');
+        }).catch((error) => {
+          setOriginOutputText('<span class="notification-error">' + ac + ' [' + name + ' ' + method + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' 连接插件 ' + JSON.stringify(error) + '</span>');
         });
       } catch (error) {
-        setOutputText('<span class="notification-error">执行 [' + name + ' ' + method + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' ' + error + '</span>');
+        setOriginOutputText('<span class="notification-error">执行 [' + name + ' ' + method + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' ' + error + '</span>');
         notification.error({
           title: '插件调用出错',
           description: error as any
@@ -138,7 +140,7 @@ export default function ContractCall({ style }: {
             size="full"
             matchButtonWidth
             appearance="button"
-            options={[...contractOption.map((item: HasDeployContractListResponse) => ({ value: item.contractName, text: item.projectName })), { value: 'custom', text: '自定义' }]}
+            options={[...contractOption.map((item: HasDeployContractListResponse) => ({ value: item.contractAddr, text: getContractOptionText(item) })), { value: 'custom', text: '自定义' }]}
             value={contractAddress}
             onChange={(value) => {
               setContractAddress(value);

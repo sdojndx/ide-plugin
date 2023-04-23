@@ -1044,7 +1044,18 @@
         .flex3 {
             flex: 3;
         }
-
+        .button-list{
+            display: flex;
+            justify-content: space-between;
+            .button-form-item{
+                width: 260px;
+                display: flex;
+                align-items: center;
+                .button-form-label{
+                    width:120px;
+                }
+            }
+        }
         .worldstate-form {
             border: 1px solid #7e8198;
             margin-top: 10px;
@@ -1075,9 +1086,10 @@
                     .cont-list {
                         margin-right: 16px;
                         flex: 1;
-
+                        *{
+                            word-break: break-all;
+                        }
                         .item {
-                            height: 45px;
                             min-height: 45px;
                             font-size: 14px;
                             box-sizing: border-box;

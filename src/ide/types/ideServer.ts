@@ -22,6 +22,7 @@ export interface DeployContractListResponse {
   contractName: string;
   path: string;
   projectName: string;
+  hash: string;
 }
 
 export interface HasDeployContractListResponse {
@@ -29,6 +30,7 @@ export interface HasDeployContractListResponse {
   date: string;
   methods: Array<string>;
   projectName: string;
+  contractAddr: string;
 }
 
 export interface PreferenceRequest {
@@ -42,7 +44,6 @@ export interface PreferenceRequest {
   editor_font_family?: string;
   editor_font_size?: string;
   line_height?: string;
-  editor_line_height?: string;
   editor_theme?: keyof typeof theme;
   tab_size?: string;
 }
@@ -114,7 +115,7 @@ export interface IdeServer {
    * @param contractName
    * @returns
    */
-  deployContract?: (contractName: string) => Promise<any>;
+  deployContract?: (param: { contractName: string; hash: string }) => Promise<any>;
   /**
    * 拉取信息
    * @returns

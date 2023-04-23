@@ -117,8 +117,6 @@ export default forwardRef(function CodeMirrorEditor({
         updateEditor(editor.path, {
           outline: res
         });
-      }).catch(e => {
-        message.error({ content: e.message });
       });
     } else {
       updateEditor(editor.path, {
@@ -137,8 +135,7 @@ export default forwardRef(function CodeMirrorEditor({
         changes: { from: 0, to: editorView.current.state.doc.length, insert: res.content }
       });
       setHasLoadFile(true);
-    }).catch(e => {
-      message.error({ content: e.message });
+    }).catch(() => {
       removeEditor(editor.path);
     });
   }, [server, editor.path]);
@@ -161,8 +158,6 @@ export default forwardRef(function CodeMirrorEditor({
         code,
         nextCmd: ''
       });
-    }).catch(e => {
-      message.error({ content: e.message });
     });
     setOrgDoc(param.code);
   }, [server, editor.hasUnSave]);
@@ -208,8 +203,6 @@ export default forwardRef(function CodeMirrorEditor({
         code,
         nextCmd: ''
       });
-    }).catch(e => {
-      message.error({ content: e.message });
     });
     setOrgDoc(param.code);
   }, [server, editor.hasUnSave]);
@@ -267,8 +260,6 @@ export default forwardRef(function CodeMirrorEditor({
       code,
       cursorLine: line,
       cursorCh: ch
-    }).catch(e => {
-      message.error({ content: e.message });
     });
     if (res) {
       openEditor({

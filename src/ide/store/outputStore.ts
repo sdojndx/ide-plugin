@@ -15,5 +15,5 @@ export const outputStore: StateCreator<OutputStore> = (set, get) => ({
   setOutputText: (text) => set((state) => ({ outputText: [...state.outputText, text] })),
   clearOutputText: () => set(() => ({ outputText: [] })),
   getOutputText: () => get().outputText,
-  setOriginOutputText: (text) => set((state) => ({ originOutputText: [...state.originOutputText, text] }))
+  setOriginOutputText: (text) => set((state) => ({ originOutputText: [...state.originOutputText, text], outputText: [...state.outputText, text] }))
 });

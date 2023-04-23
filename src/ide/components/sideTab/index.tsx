@@ -8,6 +8,7 @@ import fold from '@ide/static/svgs/fold.svg';
 import addfile from '@ide/static/svgs/addfile.svg';
 import useIdeStore from '@ide/store';
 import { FileTypes } from '@ide/utils/menu';
+import { message } from 'tea-component';
 
 const accept = FileTypes.map(item => `.${item}`);
 export default function SideTab() {

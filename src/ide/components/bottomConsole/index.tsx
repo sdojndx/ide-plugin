@@ -10,6 +10,30 @@ import IDEWorldState from './worldstate';
 import { Input } from 'tea-component';
 import useIdeStore from '@ide/store';
 
+const encodeHTML = function (str: string) {
+  if (typeof str === 'string') {
+    return str.replace(/<|&|>/g, function (matches) {
+      return ({
+        '<': '&lt;',
+        '>': '&gt;',
+        '&': '&amp;'
+      })[matches] as string;
+    });
+  }
+  return '';
+};
+const markupTags = function (str: string) {
+  if (typeof str === 'string') {
+    return str.replace(/<|>/g, function (matches) {
+      return ({
+        '<': '|||<',
+        '>': '>|||'
+      })[matches] as string;
+    });
+  }
+  return '';
+};
+
 export default function BottomConsole() {
   const [tabs] = useState<{ id: string; label: string }[]>([
     { id: 'output', label: '输出' },
@@ -44,7 +68,7 @@ export default function BottomConsole() {
   };
   const replaceOutPutText = (searchValue: string) => {
     clearOutputText();
-    originOutputText.map(item => {
+    originOutputText.forEach(item => {
       const contents = markupTags(item).split('|||');
       const searchText = encodeHTML(searchValue);
       const regexp = new RegExp(searchText, 'gi');
@@ -56,46 +80,22 @@ export default function BottomConsole() {
         return matchText;
       });
       setOutputText(newContents.join(''));
-      return newContents.join('');
+      // return newContents.join('');
     });
-  };
-
-  const encodeHTML = function (str: string) {
-    if (typeof str === 'string') {
-      return str.replace(/<|&|>/g, function (matches) {
-        return ({
-          '<': '&lt;',
-          '>': '&gt;',
-          '&': '&amp;'
-        })[matches] as string;
-      });
-    }
-    return '';
-  };
-  const markupTags = function (str: string) {
-    if (typeof str === 'string') {
-      return str.replace(/<|>/g, function (matches) {
-        return ({
-          '<': '|||<',
-          '>': '>|||'
-        })[matches] as string;
-      });
-    }
-    return '';
   };
 
   // 下移
   const downHandle = () => {
-    clearOutputText();
     const indexArray: Array<number> = [];
     const matchArray = outputText.filter((item, idx) => {
-      if (item.includes('match')) {
+      if (item?.includes('match')) {
         indexArray.push(idx);
       }
       return item.includes('match');
     });
     const matchLength = matchArray.length;
     if (matchLength) {
+      clearOutputText();
       const index = currentMatchIndex >= matchLength - 1 ? 0 : currentMatchIndex + 1;
       setCurrentMatchIndex(index);
       outputText.map((item: string, idx: number) => {
@@ -111,16 +111,16 @@ export default function BottomConsole() {
 
   // 上移
   const upHandle = () => {
-    clearOutputText();
     const indexArray: Array<number> = [];
     const matchArray = outputText.filter((item, idx) => {
-      if (item.includes('match')) {
+      if (item?.includes('match')) {
         indexArray.push(idx);
       }
       return item.includes('match');
     });
     const matchLength = matchArray.length;
     if (matchLength) {
+      clearOutputText();
       const index = currentMatchIndex <= 0 ? matchLength - 1 : currentMatchIndex - 1;
       setCurrentMatchIndex(index);
       outputText.map((item: string, idx: number) => {

@@ -9,7 +9,6 @@ export interface IdeSetting {
   setting: {
     editor_font_family?: string;
     editor_font_size?: string;
-    editor_line_height?: string;
     editor_tab_size?: string;
     editor_theme: keyof typeof theme;
     font_family?: string;
@@ -83,12 +82,13 @@ export const settingStore: StateCreator<IdeSettingStore> = (set, get) => ({
   })),
   updateIdeSetting: async (setting) => {
     const stat = get() as IdeStore;
-    await stat.server?.preference?.(setting);
+    const newSetting = {
+      ...stat.setting,
+      ...setting
+    };
+    await stat.server?.preference?.(newSetting);
     set({
-      setting: {
-        ...stat.setting,
-        ...setting
-      }
+      setting: newSetting
     });
   }
 });

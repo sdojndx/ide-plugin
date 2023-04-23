@@ -7,15 +7,13 @@ export default function SetModal() {
     setting, fontSizes, lineHeights, editorThemes, themes,
     setVisible, setModalVisible, updateIdeSetting
   } = useIdeStore();
-  const [lineHeight, setLineHeight] = useState(setting.editor_line_height);
   const [fontSize, setFontSize] = useState(setting.font_size);
   const [editorTheme, setEditorTheme] = useState<IdeSetting['setting']['editor_theme']>(setting.editor_theme);
   const [theme, setTheme] = useState(setting.theme);
 
   // 获取初始化配置
   useEffect(() => {
-    setLineHeight(setting.editor_line_height);
-    setFontSize(setting.font_size);
+    setFontSize(setting.editor_font_size);
     setEditorTheme(setting.editor_theme);
     setTheme(setting.theme);
   }, [setting]);
@@ -26,13 +24,12 @@ export default function SetModal() {
 
   const btnDisabled = useMemo(() => {
     return !setting.font_size;
-  }, [setting, lineHeight, fontSize, editorTheme, theme]);
+  }, [setting, fontSize, editorTheme, theme]);
 
   // 确认更改配置
   const changeSetSubmit = useCallback(async () => {
     await updateIdeSetting({
-      editor_line_height: lineHeight,
-      font_size: fontSize,
+      editor_font_size: fontSize,
       theme,
       editor_theme: editorTheme
     });
@@ -40,7 +37,7 @@ export default function SetModal() {
     message.success({
       content: '修改配置成功'
     });
-  }, [lineHeight, fontSize, theme, editorTheme, btnDisabled]);
+  }, [fontSize, theme, editorTheme, btnDisabled]);
 
   return (
     <Modal
@@ -65,18 +62,6 @@ export default function SetModal() {
               value={fontSize}
               onChange={value => {
                 setFontSize(value);
-              }}
-            />
-          </Form.Item>
-          <Form.Item label="行高">
-            <Select
-              size='full'
-              matchButtonWidth
-              appearance="button"
-              options={lineHeights.map(item => ({ value: item, text: item }))}
-              value={lineHeight}
-              onChange={value => {
-                setLineHeight(value);
               }}
             />
           </Form.Item>

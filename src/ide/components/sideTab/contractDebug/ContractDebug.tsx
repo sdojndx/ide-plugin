@@ -5,12 +5,12 @@ import deleteParamIcon from '../../../static/svgs/delete-icon.svg';
 import { Contract, ContractKv } from '@ide/types/contract';
 import { BuildContractParam, RunContractParam } from '@ide/types/ideServer';
 import useIdeStore from '@ide/store';
+import { getContractOptionText, getLocalStorage, removeLocalStorage, setLocalStorage } from '@ide/utils/tools';
 
 export default function ContractDebug({ style }: {
   style?: React.CSSProperties;
 }) {
-  const { server } = useIdeStore();
-  const { setOutputText } = useIdeStore();
+  const { server, setOriginOutputText, contract, hasBuild, getHasBuild, setEventData, setWorldState, worldState } = useIdeStore();
   const [constracts, setContracts] = useState<Contract[]>([]);
   const [crossContracts, setCrossContracts] = useState<Contract[]>([{ contractName: '', projectName: '', path: '' }]);
   const [selectedCrossContracts, setSelectedCrossContracts] = useState<Contract[]>([{ contractName: '', projectName: '', path: '' }]);
@@ -22,31 +22,30 @@ export default function ContractDebug({ style }: {
   const [canCross, setCanCross] = useState<boolean>(false);
   const [showLoading, setShowLoading] = useState<boolean>(false);
   const [buildResult, setBuildResult] = useState<{ complete: boolean; status: 'success' | 'error', msg: string; }>({ complete: false, status: 'error', msg: '' });
-
-  const { contract, hasBuild, getHasBuild } = useIdeStore();
-  const { setEventData } = useIdeStore();
-  const { setWorldState, worldState } = useIdeStore();
-
   // 获取合约名称列表
   const getContractName = useCallback(async () => {
     setContracts([contract]);
     setSelectedContract(contract);
     const data = await server?.getContractNames();
-    const availableContracts = data.filter((item: any) => item.contractName !== contract.contractName);
-    if (availableContracts?.length) {
-      setCrossContracts(availableContracts);
-      setSelectedCrossContracts([availableContracts[0]]);
+    setContracts(data);
+    // const availableContracts = data.filter((item: any) => item.contractName !== contract.contractName);
+    if (data?.length) {
+      setCrossContracts(data);
+      setSelectedCrossContracts([data[0]]);
     }
   }, [contract, server]);
 
   const crossContractsOptions = useMemo(() => {
-    return crossContracts.map((contract) => ({
-      value: contract?.contractName || '',
-      text: `${contract?.projectName?.length && contract?.projectName?.length > 10
-        ? contract?.projectName.slice(0, 10) + '...'
-        : contract?.projectName}${contract.contractAddr ? '(' + contract.contractAddr?.slice(0, 5) + '...' + contract.contractAddr?.slice(-3) + ')' : ''}`
-    }));
-  }, [crossContracts]);
+    return crossContracts.map((contract) => {
+      const selectCrossContractNames = selectedCrossContracts.map(item => item.contractName);
+      const disabled = selectCrossContractNames.indexOf(contract.contractName) > -1;
+      return {
+        disabled,
+        value: contract?.contractName || '',
+        text: getContractOptionText(contract)
+      };
+    });
+  }, [crossContracts, selectedCrossContracts]);
 
   // 获取合约方法名列表
   const getContractMethod = useCallback(async () => {
@@ -87,14 +86,14 @@ export default function ContractDebug({ style }: {
       }));
     }
     if (type === 'value') {
-      const exp1 = /^[^~!@#$^&*()=|':;',<>/?~！@#￥……&*（）——|【】‘；：”“'。，、？]+$/;
-      const exp2 = /^[\w.\u4e00-\u9fa5]+$/;
+      // const exp1 = /^[^~!@#$^&*()=|;<>?~！@#￥……&*（）——|【】‘；：”“。，、？]+$/;
+      // const exp2 = /^[\w\\.{}:'"-\u4e00-\u9fa5]+$/;
       setContractKvs(contraceKvs.map((kv, i) => {
         if (i === idx) {
           return {
             ...kv,
             value,
-            valueError: value ? (!exp1.test(value) || !exp2.test(value)) : false
+            valueError: false
           };
         }
         return kv;
@@ -102,10 +101,19 @@ export default function ContractDebug({ style }: {
     }
   }
 
-  function addCrossContract() {
-    setSelectedCrossContracts([...selectedCrossContracts, crossContracts[0]]);
-    // setSelectedCrossContracts([...selectedCrossContracts, { contractName: '', projectName: '', path: '' }])
-  }
+  const addCrossContract = useCallback(() => {
+    if (crossContracts.length <= selectedCrossContracts.length) {
+      message.error({
+        content: '没有更多可选择的链了'
+      });
+      return;
+    }
+    const selectCrossContractNames = selectedCrossContracts.map(item => item.contractName);
+    const autoSelect = crossContracts.find(contract => selectCrossContractNames.indexOf(contract.contractName) === -1);
+    if (autoSelect) {
+      setSelectedCrossContracts([...selectedCrossContracts, autoSelect]);
+    }
+  }, [crossContracts, selectedCrossContracts]);
 
   function deleteCrossContract(idx: number) {
     setSelectedCrossContracts(
@@ -136,15 +144,15 @@ export default function ContractDebug({ style }: {
     server?.postContractRunBuild(param).then(() => {
       setShowLoading(false);
       getHasBuild(server?.getContractHasBuild);
-    }).catch(e => {
+    }).catch(() => {
       setShowLoading(false);
-      message.error({ content: e.message });
     });
   }, [selectedContract, canCross, selectedCrossContracts, server]);
 
   // 执行合约
   const runContract = useCallback(async () => {
-    if (!selectedContract || !selectedMethod) {
+    const contractMethod = selectedMethod === '自定义' ? userContractMethod : selectedMethod;
+    if (!selectedContract || !contractMethod) {
       message.error({ content: '请选择合约和方法！' });
       return;
     }
@@ -175,7 +183,7 @@ export default function ContractDebug({ style }: {
       contractName: selectedContract.contractName!,
       crossInvoke: canCross,
       crossInvokeContractNameList: canCross && selectedCrossContracts.length ? selectedCrossContracts.map(item => item.contractName!) : [],
-      contractMethod: selectedMethod,
+      contractMethod,
       args,
       globalStates: mapGlobalState
     };
@@ -187,7 +195,7 @@ export default function ContractDebug({ style }: {
       const className = result.response.status === 0 ? 'build-succ' : 'build-error';
       if (logs.length) {
         logs.forEach((item: string) => {
-          setOutputText(
+          setOriginOutputText(
             '<span class="' + className + '">' + item + '</span>'
           );
         });
@@ -206,11 +214,10 @@ export default function ContractDebug({ style }: {
         const globalStateArr = Object.keys(globalStates).map((key) => ({ key, value: globalStates[key] }));
         setWorldState(globalStateArr);
       }
-    }).catch(e => {
+    }).catch(() => {
       setShowLoading(false);
-      message.error({ content: e.message });
     });
-  }, [canCross, selectedCrossContracts, selectedContract, selectedMethod, contraceKvs, worldState, server]);
+  }, [canCross, selectedCrossContracts, userContractMethod, selectedContract, selectedMethod, contraceKvs, worldState, server]);
 
   const resetParam = () => {
     setContractKvs([{
@@ -220,15 +227,42 @@ export default function ContractDebug({ style }: {
       valueError: false
     }]);
     setCanCross(false);
-    setCrossContracts([]);
+    // setCrossContracts([]);
   };
 
+  const resetAllParam = () => {
+    removeLocalStorage('debug');
+    resetParam();
+  };
+
+  const updateLocalParam = useCallback((param: any) => {
+    if (selectedContract?.contractName && selectedMethod) {
+      setLocalStorage('debug', selectedContract.contractName, selectedMethod, param);
+    }
+  }, [selectedContract, selectedMethod]);
+
   useEffect(() => {
-    if (!contract.contractName || !contract.path || !contract.projectName) {
+    if (selectedContract?.contractName && selectedMethod) {
+      const param = getLocalStorage('debug', selectedContract.contractName, selectedMethod);
+      const { contraceKvs, canCross, selectedCrossContracts } = param;
+      setContractKvs(contraceKvs || [{ key: '', value: '', keyError: false, valueError: false }]);
+      setCanCross(canCross || false);
+      setSelectedCrossContracts(selectedCrossContracts || [{ contractName: '', projectName: '', path: '' }]);
+    }
+  }, [selectedContract, selectedMethod]);
+
+  useEffect(() => {
+    updateLocalParam({
+      contraceKvs, canCross, selectedCrossContracts
+    });
+  }, [contraceKvs, canCross, selectedCrossContracts]);
+
+  useEffect(() => {
+    if (!contract.contractName || !contract.path || !contract.projectName || style?.display !== 'block') {
       return;
     }
     getContractName();
-  }, [contract]);
+  }, [contract, style?.display]);
 
   useEffect(() => {
     if (selectedContract && style?.display === 'block') {
@@ -238,19 +272,6 @@ export default function ContractDebug({ style }: {
   return (
     <div style={style} className="nav_tab">
       <Form className='side_tab_form' layout="vertical">
-        {/* <div className="tabs-panel contract-debug-panel"> */}
-        {/* <div className="func">
-          <Text className="label">项目名称</Text>
-          <select className="func-select" value={selectedContract?.contractName}>
-            {
-              constracts.length
-                ? (
-                  constracts.map((contract, index) => <option value={contract.contractName} key={`${contract.contractName}_${index}`}>{contract.projectName}</option>)
-                )
-                : <option>暂无合约</option>
-            }
-          </select>
-        </div> */}
         <Form.Item label="项目名称">
           <Select
             className="set-height"
@@ -259,7 +280,9 @@ export default function ContractDebug({ style }: {
             appearance="button"
             options={constracts.map((contract) => ({ value: contract?.projectName || '', text: contract?.projectName }))}
             value={selectedContract?.projectName}
-            onChange={() => { }}
+            onChange={(value) => {
+              setSelectedContract(constracts.find(item => item.projectName === value) || null);
+            }}
           />
         </Form.Item>
         <Form.Item label="合约方法">
@@ -340,7 +363,7 @@ export default function ContractDebug({ style }: {
                     size="full"
                     matchButtonWidth
                     appearance="button"
-                    defaultValue={item?.contractName}
+                    value={item?.contractName}
                     options={crossContractsOptions}
                     onChange={(value) => handleCrossContractChange(value, idx)}
                   />
@@ -389,7 +412,7 @@ export default function ContractDebug({ style }: {
 
       <div className="debug-extens-btns">
         <Button type="text" onClick={resetParam}>清空当前数据</Button>
-        <Button type="text" onClick={resetParam}>重置全部数据</Button>
+        <Button type="text" onClick={resetAllParam}>重置全部数据</Button>
       </div>
 
       {

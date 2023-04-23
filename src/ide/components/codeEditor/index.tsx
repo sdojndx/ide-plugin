@@ -14,7 +14,7 @@ export default function CodeEditor() {
   const { setting } = useIdeStore();
   const {
     editors, setEditors, removeEditor, openEditor, updateIdeSetting,
-    contract, userId, files,
+    contract, userId, files, fontSizes, lineHeights,
     isHideNav, isHideFunc, isHideBottom, setIsHideBottom, setIsHideFunc, setIsHideNav
   } = useIdeStore();
   // 初始化编辑文件选项
@@ -48,15 +48,21 @@ export default function CodeEditor() {
     openEditor({ path });
   }, []);
   const addFontSize = useCallback(() => {
-    updateIdeSetting({
-      editor_font_size: `${parseInt(setting.editor_font_size ?? '14') + 1}px`
-    });
-  }, [setting.editor_font_size]);
+    const index = setting.editor_font_size ? fontSizes.indexOf(setting.editor_font_size) : 0;
+    if (index < fontSizes.length - 1) {
+      updateIdeSetting({
+        editor_font_size: fontSizes[index + 1]
+      });
+    }
+  }, [setting.editor_font_size, fontSizes]);
   const reduceFontSize = useCallback(() => {
-    updateIdeSetting({
-      editor_font_size: `${parseInt(setting.editor_font_size ?? '14') - 1}px`
-    });
-  }, [setting.editor_font_size]);
+    const index = setting.editor_font_size ? fontSizes.indexOf(setting.editor_font_size) : 0;
+    if (index > 0) {
+      updateIdeSetting({
+        editor_font_size: fontSizes[index - 1]
+      });
+    }
+  }, [setting.editor_font_size, fontSizes, lineHeights]);
   const switchFull = useCallback(() => {
     setIsHideBottom(!isFull);
     setIsHideFunc(!isFull);

@@ -22,7 +22,6 @@ export default function IDEOutputs({ style }: {
       }
       lineUUIDs[item.uuid] = true;
       const data = JSON.parse(item.info);
-      setOutputText(data.output);
       setOriginOutputText(data.output);
       switch (data.cmd) {
         case 'build':
@@ -96,9 +95,9 @@ export default function IDEOutputs({ style }: {
       }
     }
   }, []);
-  useEffect(() => {
-    setCurrentTab('output');
-  }, [outputText]);
+  // useEffect(() => {
+  //   setCurrentTab('output');
+  // }, [outputText]);
 
   return (
     <div className='output ideoutput' style={style}>

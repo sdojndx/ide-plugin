@@ -37,8 +37,6 @@ export interface KeyValueItem {
   value: string
 }
 
-export const LIST_INIT = [{ key: '', value: '' }];
-
 export function KeyValueList({
   value,
   onChange
@@ -118,10 +116,10 @@ export default function ContractDeploy({ style }: {
   const [projectNameOptions, setProjectNameOptions] = useState([]);
   const [projectNameRelate, setProjectNameRelate] = useState<{ [x: string]: DeployContractListResponse }>({});
   const [buildTime, setBuildTime] = useState('');
-  const [extraList, setExtraList] = useState(LIST_INIT);
+  const [extraList, setExtraList] = useState([{ key: '', value: '' }]);
   const [submit, setSubmit] = useState(false);
   const { contract } = useIdeStore();
-  const { setOutputText } = useIdeStore();
+  const { setOriginOutputText } = useIdeStore();
   const { server } = useIdeStore();
 
   useEffect(() => {
@@ -185,6 +183,11 @@ export default function ContractDeploy({ style }: {
     if (server?.pluginIsConnected()) {
       try {
         // ide插件部署
+        const kvs = [...extraList.filter(
+          (item) => item.key.trim() !== '' && item.value.trim() !== ''
+        ), {
+          key: 'zxlDeployFileHash', value: projectNameRelate[projectName].hash
+        }];
         server?.pluginRequest({
           method: 'zx_deployContract',
           params: {
@@ -192,39 +195,41 @@ export default function ContractDeploy({ style }: {
             contractVersion: '1.0.0',
             contractBytes: content, // 合约内容
             runtimeType: virtualMachine,
-            kvs: extraList.filter(
-              (item) => item.key.trim() !== '' && item.value.trim() !== ''
-            ),
+            kvs,
             limit: 20000
           }
         })?.then((res) => {
-          if (res) {
-            setOutputText('<span class="notification-succ">部署 [' + projectName + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' ' + JSON.stringify(res) + '</span>');
+          if (res.message === 'OK' && res.txId) {
+            // 请求deploy接口
+            server?.deployContract?.({ contractName: getSelected.contractName, hash: projectNameRelate[projectName].hash });
+            setOriginOutputText('<span class="notification-succ">部署 [' + projectName + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' ' + JSON.stringify(res) + '</span>');
           }
         }).catch((error: any) => {
           notification.error({
             title: error,
             description: error
           });
-          setOutputText('<span class="notification-error">部署 [' + projectName + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' ' + JSON.stringify(error) + '</span>');
+          setOriginOutputText('<span class="notification-error">部署 [' + projectName + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' ' + JSON.stringify(error) + '</span>');
         });
-        setOutputText('<span class="notification-run">部署 [' + projectName + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' 插件已唤起，请在插件上选择网络/账户发起上链请求</span>');
+        setOriginOutputText('<span class="notification-run">部署 [' + projectName + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' 插件已唤起，请在插件上选择网络/账户发起上链请求</span>');
       } catch (error) {
         notification.error({
           title: '插件调用出错',
           description: error as any
         });
       }
-      // 请求deploy接口
-      await server?.deployContract?.(getSelected.contractName);
     } else {
       try {
         server?.pluginRequest({
           method: 'zx_webConnect',
           params: {}
+        }).then((res) => {
+          setOriginOutputText('<span class="notification-succ">部署 [' + projectName + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' 连接插件 ' + JSON.stringify(res) + '</span>');
+        }).catch((error) => {
+          setOriginOutputText('<span class="notification-error">部署 [' + projectName + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' 连接插件 ' + JSON.stringify(error) + '</span>');
         });
       } catch (error) {
-        setOutputText('<span class="notification-run">部署 [' + projectName + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' ' + error + '</span>');
+        setOriginOutputText('<span class="notification-run">部署 [' + projectName + '] ' + dateFormatNotification('yyyy-MM-dd hh:mm:ss') + ' ' + error + '</span>');
         notification.error({
           title: '插件调用出错',
           description: error as any
@@ -236,7 +241,7 @@ export default function ContractDeploy({ style }: {
     //   title: '部署成功',
     //   description: '部署成功'
     // });
-  }, [projectName, projectNameOptions, server]);
+  }, [projectName, projectNameOptions, projectNameRelate, server]);
 
   return (
     <div style={style} className="nav_tab">
