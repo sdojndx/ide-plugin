@@ -84,7 +84,7 @@ $ npm run build
 
 # 运行至信链测试环境
 # 至信链测试环境需要配置whistle
-# zxchain-ide-test-8fs5zjh23d8ab25-1258344699.tcloudbaseapp.com localhost:5173
+# zxchain-ide-test-8fs5zjh23d8ab25-1258344699.tcloudbaseapp.com localhost:5176
 #
 $ npm run test
 

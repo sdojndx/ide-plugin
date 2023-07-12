@@ -1,31 +1,15 @@
 import create from 'zustand';
-import { ActionDataStore, actionStore } from './actionStore';
-import { ContractDataStore, contractStore } from './contractStore';
 import { editorStore, EditorStore } from './editorStore';
-import { eventDataStore, EventDataStore } from './eventDataStore';
-import { OutputStore, outputStore } from './outputStore';
-import { IdeServerStore, serverStore } from './serverStore';
-import { IdeSettingStore, settingStore } from './settingStore';
-import { WorldStateStore, worldStateStore } from './worldStateStore';
+import { IdeStatusStore, ideStatusStore } from './ideStatusStore';
+import { StyleDataStore, styleDataStore } from './styleStore';
 
 export type IdeStore =
-  ActionDataStore &
-  ContractDataStore &
   EditorStore &
-  EventDataStore &
-  OutputStore &
-  IdeServerStore &
-  IdeSettingStore &
-  WorldStateStore;
+  IdeStatusStore&
+  StyleDataStore;
 
-const useIdeStore = create<IdeStore>((...param) => ({
-  ...actionStore(...param),
-  ...contractStore(...param),
+export const useIdeStore = create<IdeStore>((...param) => ({
   ...editorStore(...param),
-  ...eventDataStore(...param),
-  ...outputStore(...param),
-  ...serverStore(...param),
-  ...settingStore(...param),
-  ...worldStateStore(...param)
+  ...ideStatusStore(...param),
+  ...styleDataStore(...param)
 }));
-export default useIdeStore;

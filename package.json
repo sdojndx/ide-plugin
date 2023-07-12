@@ -3,7 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "main": "./dist/ide_plugin.umd.cjs",
   "module": "./dist/ide_plugin.js",
   "exports": {
@@ -14,6 +16,7 @@
   },
   "scripts": {
     "build": "tsc && vite build",
+    "dev": "vite",
     "test": "vite",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
@@ -31,6 +34,7 @@
     "autolinker": "^4.0.0",
     "axios": "^1.2.0",
     "codemirror": "^6.0.1",
+    "js-base64": "^3.7.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "reconnecting-websocket": "^4.4.0",

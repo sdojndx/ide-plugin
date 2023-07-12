@@ -1,24 +1,6 @@
 // import { Pick } from '@ide/types/common'
-import { TreeItem } from '@ide/types/tree';
 import { StateCreator } from 'zustand';
-import { IdeStore } from '.';
 import { v4 as uuidv4 } from 'uuid';
-
-export interface OutlineDetail {
-  Name: string;
-  Line: number;
-  Ch: number;
-}
-export interface OutlineResponse {
-  constDecls: OutlineDetail[];
-  funcDecls: OutlineDetail[];
-  imports: OutlineDetail[];
-  interfaceDecls: OutlineDetail[];
-  package: OutlineDetail[];
-  structDecls: OutlineDetail[];
-  typeDecls: OutlineDetail[];
-  varDecls: OutlineDetail[];
-}
 
 export interface Lint {
   lineNo: string;
@@ -30,52 +12,99 @@ export interface Lint {
 /**
  * 存储编辑文件信息
  */
-export interface EditorItemProp {
+export interface IdeFileTabItemProp {
   /**
-     * 手动添加一个本地的编辑文件唯一标识，防止重命名时编辑区数据丢失
-     */
+   * ide组件添加一个本地的编辑文件唯一标识，防止重命名时编辑区数据丢失。常用语用户更新状态。
+   */
   id: string;
+  /**
+   * 是否可以编辑,不设置默认可编辑。
+   */
   editable?: boolean;
+  /**
+   * 文件路径，有时候path是可变得，比如编辑文件名后。
+   */
   path: string;
+  /**
+   * 是否为可见的
+   */
   isVisible?: boolean;
+  /**
+   * 驱动编辑区行为数据
+   */
   action?: {
     Line: number,
     Ch: number,
     type: 'cursor';
   } | {
     v: number,
-    type: 'update'
+    type: 'updateCode'
   };
+  /**
+   * 文件警告信息
+   */
   lints?: Lint[],
+  /**
+   * tab显示的名称,默认会根据路径path 计算最后一个/符号后面内容
+   */
   name?: string;
+  /**
+   * 文件类型，默认会根据path计算
+   */
   fileType?: string;
+  /**
+   * 是否存在未保存的代码
+   */
   hasUnSave?: boolean;
-  outline?: OutlineResponse;
 }
-export type EditorItem = Omit<EditorItemProp, 'id'> & {
+export type EditorItem = Omit<IdeFileTabItemProp, 'id'> & {
   id?: string;
 };
 
 type EditorItemPartial = Partial<EditorItem>;
 
 interface EditorData {
-  editors: EditorItemProp[];
-  lints: {
-    [key: string]: Lint[]
-  };
+  /**
+   * ide在编辑的文件列表
+   */
+  ideFileTabs: IdeFileTabItemProp[];
+  /**
+   * 文件提醒信息。
+   */
+  // lints: {
+  //   [key: string]: Lint[]
+  // };
+  /**
+   * 文件打开记录
+   */
   history: string[];
-  activeTreeNode?: EditorItem;
 }
 
 const initDate = {
-  editors: [],
-  history: [],
-  lints: {}
+  ideFileTabs: [],
+  history: []
+  // lints: {}
 };
 
 export type EditorStore = EditorData & {
-  setEditors: (ls: EditorItemProp[]) => void;
+  /**
+   * 设置在编辑的文件列表
+   * @param ls 在编辑的文件列表
+   * @returns
+   */
+  setEditors: (ls: IdeFileTabItemProp[]) => void;
+  /**
+   * 更新单个在编辑文件
+   * @param path 要更新的文件路径
+   * @param item 更新的tab内容
+   * @returns
+   */
   updateEditor: (path: string, item: EditorItemPartial) => void;
+  /**
+   * 更新所有在编辑文件
+   * @param item 更新的tab内容
+   * @returns
+   */
   updateAllEditor: (item: Pick<EditorItem, 'lints'>) => void;
   /**
    * 打开并切换当前编辑文件
@@ -89,107 +118,79 @@ export type EditorStore = EditorData & {
    * @returns
    */
   removeEditor: (path: string) => void;
-  /**
-   * 设置当前选中的目录树节点
-   * @param item 选中节点信息
-   * @returns
-   */
-  setActiveTreeNode: (item: EditorItem) => void;
-  updateLints: (item: EditorData['lints']) => void;
-};
-
-const getTreeNode = (path: string, tree: TreeItem[]): TreeItem | null => {
-  for (let i = 0; i < tree.length; i++) {
-    const item = tree[i];
-    if (item.path === path) {
-      return item;
-    }
-    if (item.children) {
-      const node = getTreeNode(path, item.children);
-      if (node) {
-        return node;
-      }
-    }
-  }
-  return null;
+  // updateLints: (item: EditorData['lints']) => void;
 };
 
 export const editorStore: StateCreator<EditorStore> = (set) => ({
   ...initDate,
   setEditors: (ls) => set((state) => ({
     ...state,
-    editors: ls
+    ideFileTabs: ls
   })),
   openEditor: (item) => set((state) => {
-    const editorlist = state.editors;
+    const editorlist = state.ideFileTabs;
     const history = state.history.slice();
     let hasOpen = false;
     const name = item.name || item.path.match(/[^/]+$/)?.[0];
-    item.fileType = item.path.match(/[^.]+$/)?.[0];
-    const stat = state as IdeStore;
-    // 获取文件对应节点属性
-    const node = getTreeNode(item.path, stat.files);
-    const editors = editorlist.map(editor => {
+    item.fileType = item.fileType || item.path.match(/[^.]+$/)?.[0];
+    const ideFileTabs = editorlist.map(editor => {
       if (editor.path === item.path) {
         hasOpen = true;
         return {
           ...editor,
           ...item,
-          name: editor.name || name,
-          isVisible: true,
-          editable: node?.editable
+          isVisible: true
         };
       }
       editor.isVisible = false;
       return editor;
     });
     if (!hasOpen) {
-      editors.push({
+      ideFileTabs.push({
         ...item,
         name,
         isVisible: true,
-        editable: node?.editable,
         id: uuidv4()
       });
     }
 
     history.push(item.path);
-    return { editors, history };
+    return { ideFileTabs, history };
   }),
   // 移除编辑文件
   removeEditor: (path) => set((state) => {
-    const editors = state.editors.slice();
+    const ideFileTabs = state.ideFileTabs.slice();
     const history = state.history.slice();
-    const index = editors.findIndex(editor => editor.path === path);
+    const index = ideFileTabs.findIndex(editor => editor.path === path);
     if (index === -1) {
       return {
-        editors, history
+        ideFileTabs, history
       };
     }
-    editors.splice(index, 1);
+    ideFileTabs.splice(index, 1);
     for (let i = history.length; i >= 0; i--) {
       if (path === history[i]) {
         history.splice(i, 1);
       }
     }
-    const editor = editors.find(editor => editor.isVisible);
+    const editor = ideFileTabs.find(editor => editor.isVisible);
     if (!editor) {
       const p = history[history.length - 1];
-      const edit = editors.find(editor => editor.path === p);
+      const edit = ideFileTabs.find(editor => editor.path === p);
       if (edit) {
         edit.isVisible = true;
       }
     }
-    return { editors, history };
+    return { ideFileTabs, history };
   }),
   // 文件名变化情况下 更新编辑文件
   updateEditor: (path, item) => set((state) => {
-    const editorlist = state.editors;
+    const editorlist = state.ideFileTabs;
     if (item.path) {
-      item.fileType = item.path.match(/[^.]+$/)?.[0];
+      item.fileType = item.fileType || item.path.match(/[^.]+$/)?.[0];
       item.name = item.name || item.path.match(/[^/]+$/)?.[0];
     }
-    const editors = editorlist.map(editor => {
+    const ideFileTabs = editorlist.map(editor => {
       if (editor.path === path) {
         return {
           ...editor,
@@ -198,23 +199,20 @@ export const editorStore: StateCreator<EditorStore> = (set) => ({
       }
       return editor;
     });
-    return { editors };
+    return { ideFileTabs };
   }),
   // 批量更新所以在编辑文件
   updateAllEditor: (item) => set((state) => {
-    const editorlist = state.editors;
-    const editors = editorlist.map(editor => {
+    const editorlist = state.ideFileTabs;
+    const ideFileTabs = editorlist.map(editor => {
       return {
         ...editor,
         ...item
       };
     });
-    return { editors };
-  }),
-  setActiveTreeNode: (item) => set(() => {
-    return { activeTreeNode: item };
-  }),
-  updateLints: (item) => set(() => ({
-    lints: item
-  }))
+    return { ideFileTabs };
+  })
+  // updateLints: (item) => set(() => ({
+  //   lints: item
+  // }))
 });

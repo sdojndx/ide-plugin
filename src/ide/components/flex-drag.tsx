@@ -1,4 +1,4 @@
-import useIdeStore from '@ide/store';
+import { useIdeStore } from '@ide/store';
 import React, { useCallback, useRef, useState } from 'react';
 
 interface Event {

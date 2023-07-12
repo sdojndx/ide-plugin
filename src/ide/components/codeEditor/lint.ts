@@ -7,7 +7,7 @@ export const outLint = (lints: EditorItem['lints']) => {
     const code = view.state.doc.toString() || '';
     const diagnostics: Diagnostic[] = lints
       ? lints.map(item => {
-        const pos = getPostByLineAndCh(code, Number(item.lineNo) + 1, 0);
+        const pos = getPostByLineAndCh(code, Number(item.lineNo), 0);
         return {
           from: pos,
           to: pos,

@@ -2,7 +2,7 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo
 import { EditorState, Compartment, EditorSelection } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { StreamLanguage } from '@codemirror/language';
-import { basicSetup } from './basicSetup';
+import { BASIC_SETUP } from './basicSetup';
 
 // import { javascript } from '@codemirror/lang-javascript'
 import { javascript } from '@codemirror/legacy-modes/mode/javascript';
@@ -17,12 +17,12 @@ import keyMap from './keyMap';
 import completionSource from './autoCompletion';
 import { getLineAndChByPos, getPostByLineAndCh } from './tools';
 import { outLint } from './lint';
-import useIdeStore from '@ide/store';
-import { message } from 'tea-component';
-import { FileTypes } from '@ide/utils/menu';
+import { useIdeStore } from '@ide/store';
+import { FILE_TYPES } from '@ide/utils/menu';
+import { useServerStore } from '@ide/store/serverStore';
 
 const fileTypeMap: any = {};
-FileTypes.forEach(item => {
+FILE_TYPES.forEach(item => {
   fileTypeMap[item] = javascript;
 });
 
@@ -38,7 +38,8 @@ export default forwardRef(function CodeMirrorEditor({
   const dom = useRef<HTMLDivElement | null>(null);
   const editorView = useRef<EditorView | null>(null);
   const [hasLoadFile, setHasLoadFile] = useState<boolean>(false);
-  const { server, removeEditor, updateEditor, openEditor, updateLints, lints } = useIdeStore();
+  const { editorTheme, removeEditor, updateEditor } = useIdeStore();
+  const { ideEventListener } = useServerStore();
   // 服务器端代码缓存
   const [orgDoc, setOrgDoc] = useState<string>('');
   const themeConfig = useRef<Compartment>(new Compartment());
@@ -46,7 +47,7 @@ export default forwardRef(function CodeMirrorEditor({
   const autocompleteConfig = useRef<Compartment>(new Compartment());
   const lintsConfig = useRef<Compartment>(new Compartment());
   const langConfig = useRef<Compartment>(new Compartment());
-  const { setting } = useIdeStore();
+  const { ideStyle } = useIdeStore();
   const [typeMap] = useState({
     ...fileTypeMap,
     go
@@ -54,34 +55,32 @@ export default forwardRef(function CodeMirrorEditor({
   const editorStyle: React.CSSProperties = useMemo(() => {
     return {
       ...style,
-      ...{
-        fontSize: setting.editor_font_size
-      }
+      ...ideStyle
     };
-  }, [style, setting.editor_font_size]);
+  }, [style, ideStyle]);
   const updateConfig = useRef<Compartment>(new Compartment());
   const editorableConfig = useRef<Compartment>(new Compartment());
   useEffect(() => {
     const state = EditorState.create({
       doc: '',
       extensions: [
-        ...basicSetup,
+        ...BASIC_SETUP,
         lintGutter(),
         updateConfig.current.of(EditorView.updateListener.of(() => {
         })),
         editorableConfig.current.of(EditorView.editable.of(true)),
         EditorState.allowMultipleSelections.of(false),
-        autocompleteConfig.current.of(autocompletion(server?.autocomplete
+        autocompleteConfig.current.of(autocompletion(ideEventListener?.autocomplete
           ? {
             override: [completionSource({
-              getAutoComplate: server.autocomplete,
-              path: editor.path
+              getAutoComplate: ideEventListener.autocomplete,
+              editor
             })]
           }
           : undefined)),
         langConfig.current.of(StreamLanguage.define(typeMap[(editor.fileType as keyof typeof typeMap)])),
         keyConfig.current.of(keyMap(editor)),
-        themeConfig.current.of(theme[setting.editor_theme] || theme.vscodeDark),
+        themeConfig.current.of((theme as any)[editorTheme] || theme.vscodeDark),
         lintsConfig.current.of(linter(() => ([])))]
     });
     const view = new EditorView({
@@ -96,116 +95,91 @@ export default forwardRef(function CodeMirrorEditor({
   // 检测是否可编辑
   useEffect(() => {
     getFile();
-    if (editorView.current) {
+    if (editorView.current && editor.editable !== undefined) {
       editorView.current?.dispatch({
-        effects: editorableConfig.current.reconfigure(EditorView.editable.of(editor.editable === undefined ? true : editor?.editable))
+        effects: editorableConfig.current.reconfigure(EditorView.editable.of(editor.editable))
       });
     }
-  }, [editorView, editor?.editable]);
+  }, [editorView, editor.editable]);
   // 更新主题
   useEffect(() => {
     if (editorView.current) {
       editorView.current?.dispatch({
-        effects: themeConfig.current.reconfigure(theme[setting.editor_theme])
+        effects: themeConfig.current.reconfigure((theme as any)[editorTheme])
       });
     }
-  }, [setting.editor_theme]);
+  }, [editorTheme]);
   // 获取文件方法函数目录
-  const updateOutline = useCallback((code: string) => {
-    if (code) {
-      server?.fileOutline?.(code).then(res => {
-        updateEditor(editor.path, {
-          outline: res
-        });
-      });
-    } else {
-      updateEditor(editor.path, {
-        outline: undefined
-      });
-    }
-  }, []);
+  // const updateOutline = useCallback((code: string) => {
+  //   if (code) {
+  //     ideEventListener?.onGoFileOpen?.(code).then(res => {
+  //       updateEditor(editor.path, {
+  //         outline: res
+  //       });
+  //     });
+  //   } else {
+  //     updateEditor(editor.path, {
+  //       outline: undefined
+  //     });
+  //   }
+  // }, []);
   // 获取文件内容和目录
   const getFile = useCallback(() => {
-    if (!editorView.current || !editor.path || !server) {
+    if (!editorView.current || !ideEventListener) {
       return;
     }
-    server?.getFileContent?.(editor.path).then(res => {
-      setOrgDoc(res.content);
+    ideEventListener?.onGetFileContent?.(editor).then(res => {
+      setOrgDoc(res);
       editorView.current?.dispatch({
-        changes: { from: 0, to: editorView.current.state.doc.length, insert: res.content }
+        changes: { from: 0, to: editorView.current.state.doc.length, insert: res }
       });
       setHasLoadFile(true);
     }).catch(() => {
       removeEditor(editor.path);
     });
-  }, [server, editor.path]);
+  }, [editor.path]);
   const close = useCallback(() => {
     removeEditor(editor.path);
   }, [editor.path]);
   // 自动保存函数
   const saveFile = useCallback(async () => {
-    if (!editorView.current || !server || !editor.hasUnSave) {
+    if (!editorView.current || !ideEventListener?.onFileAutoSave || !editor.hasUnSave) {
       return;
     }
     const code = editorView.current.state.doc.toString() || '';
-    const param = {
-      file: editor.path,
-      code
-    };
-    server?.saveFile?.(param).then(() => {
-      server?.build?.({
-        file: editor.path,
-        code,
-        nextCmd: ''
+    const pos = editorView.current.state.selection.ranges[0].from;
+    const { line, ch } = getLineAndChByPos(code, pos);
+    const newCode = await ideEventListener.onFileAutoSave?.(editor, code, line, ch);
+    if (newCode && newCode !== code) {
+      editorView.current?.dispatch({
+        changes: { from: 0, to: editorView.current.state.doc.length, insert: newCode }
       });
-    });
-    setOrgDoc(param.code);
-  }, [server, editor.hasUnSave]);
+    }
+    setOrgDoc(newCode || code);
+  }, [editor.hasUnSave, editorView]);
   /**
    * 保存文件函数
    *
    * doNotCheck 是否校验是否有修改 true 为不校验，默认未校验
    *   */
-  const save = useCallback(async (doNotCheck?: boolean) => {
-    if (!editorView.current || !server) {
-      return;
-    }
-    if (!doNotCheck && !editor.hasUnSave) {
+  const save = useCallback(async () => {
+    if (!editorView.current || !ideEventListener?.onFileSave || !editor.hasUnSave) {
       return;
     }
     const code = editorView.current.state.doc.toString() || '';
     const pos = editorView.current.state.selection.ranges[0].from;
-    const param = {
-      file: editor.path,
-      code
-    };
-    if (editor.fileType === 'go') {
-      const { line, ch } = getLineAndChByPos(code, pos);
-      const fmtParam = {
-        ...param,
-        cursorLine: line,
-        cursorCh: ch
-      };
-      updateLints({});
-      try {
-        const newCode = await server?.fmt?.(fmtParam);
-        param.code = newCode;
-        editorView.current?.dispatch({
-          changes: { from: 0, to: editorView.current.state.doc.length, insert: newCode }
-        });
-      } catch (e: any) {
-        message.error({ content: e.message });
-      }
-    }
-    server?.saveFile?.(param).then(() => {
-      server?.build?.({
-        file: editor.path,
-        code,
-        nextCmd: ''
+    const { line, ch } = getLineAndChByPos(code, pos);
+
+    // ideEventListener?.onFileSave?.(editor, code, line, ch);
+    const newCode = await ideEventListener.onFileSave?.(editor, code, line, ch);
+    console.log(newCode);
+    if (newCode && newCode !== code) {
+      editorView.current?.dispatch({
+        changes: { from: 0, to: editorView.current.state.doc.length, insert: newCode }
       });
-    });
-    setOrgDoc(param.code);
-  }, [server, editor.hasUnSave]);
+    }
+    setOrgDoc(newCode || code);
+  }, [editor.hasUnSave]);
 
   // 更新文件是否修改过校验
   useEffect(() => {
@@ -231,18 +205,11 @@ export default forwardRef(function CodeMirrorEditor({
     if (!hasLoadFile) {
       return;
     }
-    if (editor.fileType === 'go') {
-      updateOutline(orgDoc);
-      server?.build?.({
-        file: editor.path,
-        code: orgDoc,
-        nextCmd: ''
-      });
-    }
-  }, [orgDoc, hasLoadFile]);
+    ideEventListener?.onFileContentUpdate?.(editor, orgDoc);
+  }, [orgDoc, hasLoadFile, editor.id]);
   // 更新校验
-  const decl = useCallback(async (event?: MouseEvent) => {
-    if (!event || !editorView.current || !server || editor.fileType !== 'go') {
+  const decl = useCallback((event?: MouseEvent) => {
+    if (!event || !editorView.current || !ideEventListener?.decl || editor.fileType !== 'go') {
       return;
     }
     const code = editorView.current.state.doc.toString() || '';
@@ -255,24 +222,8 @@ export default forwardRef(function CodeMirrorEditor({
       return;
     }
     const { line, ch } = getLineAndChByPos(code, pos || 0);
-    const res = await server?.decl({
-      path: editor.path,
-      code,
-      cursorLine: line,
-      cursorCh: ch
-    });
-    if (res) {
-      openEditor({
-        path: res.path,
-        name: res.path.match(/[^/]+$/)?.[0],
-        action: {
-          Line: res.cursorLine,
-          Ch: res.cursorCh,
-          type: 'cursor'
-        }
-      });
-    }
-  }, [server, editorView, editor.path]);
+    ideEventListener.decl(editor, code, line, ch);
+  }, [editorView, editor.path]);
   // 绑定热键函数
   useEffect(() => {
     if (!editorView.current) {
@@ -289,9 +240,9 @@ export default forwardRef(function CodeMirrorEditor({
   }, [save, decl, close, editorView]);
 
   // 更新错误提示行信息
-  const editorLints = useMemo(() => {
-    return lints[editor.path];
-  }, [editor.path, lints]);
+  // const editorLints = useMemo(() => {
+  //   return lints[editor.path];
+  // }, [editor.path, lints]);
 
   useEffect(() => {
     if (!editorView.current) {
@@ -300,11 +251,12 @@ export default forwardRef(function CodeMirrorEditor({
     // const select = editorView.current.state.selection
     editorView.current.dispatch({
       // selection: editorView.current.state.selection,
-      effects: lintsConfig.current.reconfigure(outLint(editorLints || []))
+      effects: lintsConfig.current.reconfigure(outLint(editor.lints || []))
     });
-  }, [editorView, editorLints]);
+  }, [editorView, editor.lints]);
 
   useEffect(() => {
+    console.log([getFile, hasLoadFile, editor.action]);
     if (!hasLoadFile || !editor.action) {
       return;
     }
@@ -318,7 +270,7 @@ export default forwardRef(function CodeMirrorEditor({
         });
         editorView.current?.focus();
         break;
-      case 'update':
+      case 'updateCode':
         getFile();
         break;
       default:
@@ -327,11 +279,14 @@ export default forwardRef(function CodeMirrorEditor({
   }, [getFile, hasLoadFile, editor.action]);
 
   useEffect(() => {
+    if (!ideEventListener?.onFileAutoSave) {
+      return;
+    }
     const timer = setTimeout(() => {
       saveFile();
     }, 10000);
     return () => clearTimeout(timer);
-  }, [saveFile]);
+  }, [saveFile, ideEventListener?.onFileAutoSave]);
 
   useImperativeHandle(refs, () => ({
     save

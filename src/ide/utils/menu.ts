@@ -15,41 +15,41 @@ export interface MenuItem {
   title: string,
   icon: string,
   active: string,
-  type: string
+  id: string
 }
 
 export const MENU_LIST: Array<MenuItem> = [{
   title: '文件浏览',
   icon: file,
   active: fileActive,
-  type: 'fileTree'
+  id: 'fileTree'
 }, {
   title: '合约调试',
   icon: adjust,
   active: adjustActive,
-  type: 'contractDebug'
+  id: 'contractDebug'
 }, {
   title: '合约编译',
   icon: build,
   active: buildActive,
-  type: 'contractCompile'
+  id: 'contractCompile'
 }, {
   title: '合约部署',
   icon: deploy,
   active: deployActive,
-  type: 'contractDeploy'
+  id: 'contractDeploy'
 }, {
   title: '合约调用',
   icon: call,
   active: callActive,
-  type: 'contractCall'
+  id: 'contractCall'
 }, {
   title: '设置',
   icon: setup,
   active: setup,
-  type: 'set'
+  id: 'set'
 }];
 
-export const FileTypes: string[] = [
+export const FILE_TYPES: string[] = [
   'go', 'txt', 'md', 'mod', 'sum', 'java', 'sol', 'crt', 'pem', 'key', 'yml'
 ];

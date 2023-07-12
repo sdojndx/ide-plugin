@@ -7,7 +7,7 @@ import { closeBrackets, autocompletion, closeBracketsKeymap, completionKeymap } 
 import { lintKeymap } from '@codemirror/lint';
 export { EditorView } from '@codemirror/view';
 
-const basicSetup = (() => [
+const BASIC_SETUP = (() => [
   lineNumbers(),
   highlightActiveLineGutter(),
   highlightSpecialChars(),
@@ -36,4 +36,4 @@ const basicSetup = (() => [
   ])
 ])();
 
-export { basicSetup };
+export { BASIC_SETUP };

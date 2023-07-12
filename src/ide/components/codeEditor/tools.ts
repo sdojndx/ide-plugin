@@ -1,7 +1,7 @@
 export const getLineAndChByPos = (code: string, pos: number) => {
   const codels = code.slice(0, pos).split('\n');
   return {
-    line: codels.length - 1,
+    line: codels.length,
     ch: codels[codels.length - 1].length
   };
 };

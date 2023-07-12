@@ -32,7 +32,7 @@ export function removeLocalStorage(action: string, dir?: string, func?: string) 
 }
 
 export function getContractOptionText({ projectName, contractAddr }: { projectName?: string; contractAddr?: string; }) {
-  return `${projectName && projectName?.length > 10
-    ? projectName.slice(0, 10) + '...'
+  return `${projectName && projectName?.length > 15
+    ? projectName.slice(0, 15) + '...'
     : projectName}${contractAddr ? '(' + contractAddr?.slice(0, 5) + '...' + contractAddr?.slice(-3) + ')' : ''}`;
 };

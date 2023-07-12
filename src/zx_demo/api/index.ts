@@ -1,9 +1,4 @@
-import {
-  createGetChannel,
-  createGetChannelBlob,
-  createPostChannel,
-  createPostFormDataChannel,
-} from './request';
+import { createPostChannel, createGetChannel, createPostFormDataChannel, createGetChannelBlob } from './request';
 
 export const getUser = createGetChannel('api/v1/user/info/get');
 
@@ -24,27 +19,19 @@ export const autocomplete = createPostChannel('api/v1/ide/autocomplete');
 
 export const removeFile = createPostChannel('api/v1/ide/file/remove');
 export const renameFile = createPostChannel('api/v1/ide/file/rename');
-export const contractHasBuild = createPostChannel(
-  'api/v1/ide/contractHasBuild',
-);
+export const contractHasBuild = createPostChannel('api/v1/ide/contractHasBuild');
 
 export const contractNames = createPostChannel('api/v1/ide/compileDirectory');
 export const contractMethod = createPostChannel('api/v1/ide/dockergo/method');
 
-export const deployContractList = createPostChannel(
-  'api/v1/ide/deploy/contractList',
-);
+export const deployContractList = createPostChannel('api/v1/ide/deploy/contractList');
 export const contractRunBuild = createPostChannel('api/v1/ide/buildAll');
 export const contractInvokeAll = createPostChannel('api/v1/ide/invokeAll');
 export const contractCompile = createPostChannel('api/v1/ide/cross');
 
-export const getContractFile = createGetChannelBlob(
-  'api/v1/ide/file/getContractFile',
-);
+export const getContractFile = createGetChannelBlob('api/v1/ide/file/getContractFile');
 export const deployContract = createPostChannel('api/v1/ide/deploy');
-export const hasDeployContractList = createPostChannel(
-  'api/v1/ide/deploy/hasDeployContractList',
-);
+export const hasDeployContractList = createPostChannel('api/v1/ide/deploy/hasDeployContractList');
 export const preference = createPostChannel('api/v1/ide/preference');
 export const pullnotify = createPostChannel('api/v1/ide/pullnotify');
 export const newContract = createPostChannel('api/v1/ide/new/contract');

@@ -3,11 +3,12 @@ import {
   CompletionContext,
   CompletionResult
 } from '@codemirror/autocomplete';
-import { AutocomplateRequest } from '@ide/types/ideServer';
+import { IdeEventListener } from '@ide/types/ideEventListener';
 import { getLineAndChByPos } from './tools';
+import { EditorItem } from '@ide/store/editorStore';
 
 // let timer: any
-export default function autoCompletion({ getAutoComplate, path }: { getAutoComplate: (param: AutocomplateRequest) => Promise<any>, path: string }) {
+export default function autoCompletion({ getAutoComplate, editor }: { getAutoComplate: IdeEventListener['autocomplete'], editor:EditorItem }) {
   return async function completionSource(
     context: CompletionContext
   ): Promise<CompletionResult> {
@@ -17,17 +18,17 @@ export default function autoCompletion({ getAutoComplate, path }: { getAutoCompl
     const checkCode = code.slice(0, pos).match(/\w+$/)?.[0];
     const codeLength = checkCode?.length ? checkCode.length : 0;
     const { line, ch } = getLineAndChByPos(code, pos);
-    const res = await getAutoComplate({
-      path,
+    const res = await getAutoComplate?.(
+      editor,
       code,
-      cursorLine: line,
-      cursorCh: ch
-    });
+      line,
+      ch
+    );
     return {
       // from: word.from,
       // options,
       from: pos - codeLength,
-      options: res,
+      options: res || [],
       filter: false
     };
   };
