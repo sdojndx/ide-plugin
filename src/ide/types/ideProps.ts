@@ -1,6 +1,5 @@
 import React from 'react';
-import { IdeSetting } from '@/zx_demo/store/settingStore';
-import { IdeEventListener } from './IdeEventListener';
+import { IdeEventListener } from './ideEventListener';
 
 export interface SideNavs{
   menuIcon?: React.ReactNode;
@@ -16,8 +15,7 @@ export interface IdeProps{
    */
   headerContent?: React.ReactNode;
   /**
-   * 监听创建函数
-   * @param store ide组件内部数据
+   * ide组件的事件监听函数
    * @returns
    */
   ideEventListener: IdeEventListener,
@@ -25,13 +23,17 @@ export interface IdeProps{
   /**
    * 左导航模块,如果不传则页面不展示这个模块 （可切换的导航）
    */
-  leftNavMenuContent:React.ReactNode;
+  leftNavMenuContent?:React.ReactNode;
   /**
    * 左导航功能区模块 （一般为随左导航切换的功能区域）
    */
-  leftNavContent:React.ReactNode;
+  leftNavContent?:React.ReactNode;
   /**
-   *  地步日志区域模块，不传则不展示
+   * 编辑区右侧区域模块
    */
-  bottomContent:React.ReactNode;
+  rightContent?:React.ReactNode;
+  /**
+   *  底部日志区域模块，不传则不展示
+   */
+  bottomContent?:React.ReactNode;
 }

@@ -1,18 +1,24 @@
 {
-  "name": "ide_plugin",
+  "name": "ide-plugin",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "files": [
     "dist"
   ],
-  "main": "./dist/ide_plugin.umd.cjs",
-  "module": "./dist/ide_plugin.js",
+  "main": "./dist/ide-plugin.umd.cjs",
+  "module": "./dist/ide-plugin.js",
+  "types": "./dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git@git.woa.com:CVMFETeam/ide-plugin.git"
+  },
   "exports": {
     ".": {
-      "import": "./dist/ide_plugin.js",
-      "require": "./dist/ide_plugin.umd.cjs"
-    }
+      "import": "./dist/ide-plugin.js",
+      "require": "./dist/ide-plugin.umd.cjs"
+    },
+    "./style.css": "./dist/style.css"
   },
   "scripts": {
     "build": "tsc && vite build",
@@ -44,6 +50,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.21.3",
+    "@rollup/plugin-typescript": "^11.1.2",
     "@storybook/addon-actions": "^6.5.16",
     "@storybook/addon-essentials": "^6.5.16",
     "@storybook/addon-interactions": "^6.5.16",
@@ -66,7 +73,8 @@
     "eslint-plugin-react": "^7.31.11",
     "eslint-plugin-storybook": "^0.6.11",
     "less": "^4.1.3",
-    "typescript": "^4.9.4",
-    "vite": "^3.2.3"
+    "typescript": "^5.1.6",
+    "vite": "^3.2.3",
+    "vite-plugin-static-copy": "^0.17.0"
   }
 }

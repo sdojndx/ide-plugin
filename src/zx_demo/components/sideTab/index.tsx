@@ -7,7 +7,7 @@ import React, { useCallback, useRef } from 'react';
 import fold from '@ide/static/svgs/fold.svg';
 import addfile from '@ide/static/svgs/addfile.svg';
 import { useIdeStore } from '@ide/store';
-import { FILE_TYPES } from '@ide/utils/menu';
+import { FILE_TYPES } from '@/zx_demo/utils/menu';
 import { SideNavs } from '@ide/types/ideProps';
 import useAppStore from '@/zx_demo/store';
 import appServer from '@/zx_demo/api/appServer';

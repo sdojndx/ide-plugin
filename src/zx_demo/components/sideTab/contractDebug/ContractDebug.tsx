@@ -4,7 +4,7 @@ import addParamIcon from '@ide/static/svgs/add-icon.svg';
 import deleteParamIcon from '@ide/static/svgs/delete-icon.svg';
 import { Contract, ContractKv } from '@ide/types/contract';
 import { BuildContractParam, RunContractParam } from '@ide/types/ideEventListener';
-import { getContractOptionText, getLocalStorage, removeLocalStorage, setLocalStorage } from '@ide/utils/tools';
+import { getContractOptionText, getLocalStorage, removeLocalStorage, setLocalStorage } from '@/zx_demo/utils/tools';
 import useAppStore from '@/zx_demo/store';
 import { useServerStore } from '@ide/store/serverStore';
 import appServer from '@/zx_demo/api/appServer';

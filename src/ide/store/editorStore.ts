@@ -101,6 +101,13 @@ export type EditorStore = EditorData & {
    */
   updateEditor: (path: string, item: EditorItemPartial) => void;
   /**
+   * 更新单个在编辑文件
+   * @param id 要更新的文件路径
+   * @param item 更新的tab内容
+   * @returns
+   */
+  updateEditorById: (id: string, item: EditorItemPartial) => void;
+  /**
    * 更新所有在编辑文件
    * @param item 更新的tab内容
    * @returns
@@ -114,10 +121,16 @@ export type EditorStore = EditorData & {
   openEditor: (item: EditorItem) => void;
   /**
    * 移除编辑中的某个文件节点tab
-   * @param item 移除的节点信息
+   * @param path 要移除项的Path
    * @returns
    */
   removeEditor: (path: string) => void;
+  /**
+   * 移除编辑中的某个文件节点tab
+   * @param id 要移除项的Id
+   * @returns
+   */
+  removeEditorById: (id: string) => void;
   // updateLints: (item: EditorData['lints']) => void;
 };
 
@@ -183,6 +196,33 @@ export const editorStore: StateCreator<EditorStore> = (set) => ({
     }
     return { ideFileTabs, history };
   }),
+  // 移除编辑文件
+  removeEditorById: (id) => set((state) => {
+    const ideFileTabs = state.ideFileTabs.slice();
+    const history = state.history.slice();
+    const index = ideFileTabs.findIndex(editor => editor.id === id);
+    const path = ideFileTabs[index].path;
+    if (index === -1) {
+      return {
+        ideFileTabs, history
+      };
+    }
+    ideFileTabs.splice(index, 1);
+    for (let i = history.length; i >= 0; i--) {
+      if (path === history[i]) {
+        history.splice(i, 1);
+      }
+    }
+    const editor = ideFileTabs.find(editor => editor.isVisible);
+    if (!editor) {
+      const p = history[history.length - 1];
+      const edit = ideFileTabs.find(editor => editor.path === p);
+      if (edit) {
+        edit.isVisible = true;
+      }
+    }
+    return { ideFileTabs, history };
+  }),
   // 文件名变化情况下 更新编辑文件
   updateEditor: (path, item) => set((state) => {
     const editorlist = state.ideFileTabs;
@@ -192,6 +232,24 @@ export const editorStore: StateCreator<EditorStore> = (set) => ({
     }
     const ideFileTabs = editorlist.map(editor => {
       if (editor.path === path) {
+        return {
+          ...editor,
+          ...item
+        };
+      }
+      return editor;
+    });
+    return { ideFileTabs };
+  }),
+  // 文件名变化情况下 更新编辑文件
+  updateEditorById: (id, item) => set((state) => {
+    const editorlist = state.ideFileTabs;
+    if (item.path) {
+      item.fileType = item.fileType || item.path.match(/[^.]+$/)?.[0];
+      item.name = item.name || item.path.match(/[^/]+$/)?.[0];
+    }
+    const ideFileTabs = editorlist.map(editor => {
+      if (editor.id === id) {
         return {
           ...editor,
           ...item

@@ -11,7 +11,7 @@ import {
 import { KeyValueList, KeyValueItem, dateFormatNotification } from '../contractDeploy/ContractDeploy';
 import { HasDeployContractListResponse } from '@ide/types/ideEventListener';
 import { ExecResult } from '../components/ExecResult';
-import { getContractOptionText } from '@ide/utils/tools';
+import { getContractOptionText } from '@/zx_demo/utils/tools';
 import useAppStore from '@/zx_demo/store';
 import { useServerStore } from '@ide/store/serverStore';
 import appServer from '@/zx_demo/api/appServer';

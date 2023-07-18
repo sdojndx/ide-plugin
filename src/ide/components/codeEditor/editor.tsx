@@ -18,7 +18,7 @@ import completionSource from './autoCompletion';
 import { getLineAndChByPos, getPostByLineAndCh } from './tools';
 import { outLint } from './lint';
 import { useIdeStore } from '@ide/store';
-import { FILE_TYPES } from '@ide/utils/menu';
+import { FILE_TYPES } from '@/zx_demo/utils/menu';
 import { useServerStore } from '@ide/store/serverStore';
 
 const fileTypeMap: any = {};

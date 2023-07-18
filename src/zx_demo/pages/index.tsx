@@ -1,11 +1,10 @@
 import logo from '../assets/svgs/logo.svg';
 import Ide from '@ide/index';
-import { IdeSetting } from '@/zx_demo/store/settingStore';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, message } from 'tea-component';
+import { message } from 'tea-component';
 import { files, getUser, index, logOut, newContract } from '../api';
 import { useIdeStore } from '@ide/store';
-import { MENU_LIST } from '@ide/utils/menu';
+import { MENU_LIST } from '@/zx_demo/utils/menu';
 import ContractFileTree from '@/zx_demo/components/sideTab/contractFileTree';
 import ContractDebug from '@/zx_demo/components/sideTab/contractDebug/ContractDebug';
 import ContractCompile from '@/zx_demo/components/sideTab/contractCompile/ContractCompile';
@@ -20,6 +19,7 @@ import SideMenu from '@/zx_demo/components/SideMenu';
 import ideEventListenerCreater from '../api/ideEventListener';
 import useAppStore from '../store';
 import Structure from '../components/structure';
+import BottomConsole from '../components/bottomConsole';
 
 const menuMap = {
   fileTree: <ContractFileTree/>,
@@ -224,8 +224,11 @@ export default function Home() {
           leftNavContent={
             <SideTab navList={navList}/>
           }
-          bottomContent={
+          rightContent={
             <Structure />
+          }
+          bottomContent={
+            <BottomConsole />
           }
           ideEventListener={ideEventListener}
         ></Ide>

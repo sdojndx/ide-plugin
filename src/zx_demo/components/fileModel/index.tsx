@@ -3,7 +3,7 @@ import { useIdeStore } from '@ide/store';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Input, message } from 'tea-component';
 import { Modal } from 'tea-component/lib/modal/Modal';
-import { FILE_TYPES } from '@ide/utils/menu';
+import { FILE_TYPES } from '@/zx_demo/utils/menu';
 import useAppStore from '@/zx_demo/store';
 import appServer from '@/zx_demo/api/appServer';
 

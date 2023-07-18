@@ -8,19 +8,17 @@ import fold from './static/svgs/fold.svg';
 import righticon from './static/svgs/righticon.svg';
 import downicon from './static/svgs/downicon.svg';
 import CodeEditor from './components/codeEditor';
-import BottomConsole from '../zx_demo/components/bottomConsole';
 import { IdeProps } from './types/ideProps';
 import { useServerStore } from './store/serverStore';
 import { useIdeStore } from './store';
-export * from './store';
-export * from './types';
 
-const Ide = ({
+const IdeComponent = ({
   ideEventListener,
   headerContent,
   leftNavMenuContent,
   leftNavContent,
-  bottomContent
+  bottomContent,
+  rightContent
 }: IdeProps) => {
   const { ideTheme, dragType, isHideNav, setIsHideNav, isHideFunc, setIsHideFunc, isHideBottom, setIsHideBottom } = useIdeStore();
   const { setIdeEventListener } = useServerStore();
@@ -51,16 +49,18 @@ const Ide = ({
           <div className='flex_one'>
             <CodeEditor />
           </div>
-          {(!bottomContent) || <><FlexDrag className='ide_func' dragSides={['left']} minWidth={200} maxWidth={400} style={{ display: isHideFunc ? 'none' : 'flex' }}>
-            {bottomContent}
+          {(!rightContent) || <><FlexDrag className='ide_func' dragSides={['left']} minWidth={200} maxWidth={400} style={{ display: isHideFunc ? 'none' : 'flex' }}>
+            {rightContent}
           </FlexDrag>
           <div className='ide_func_open' style={{ display: isHideFunc ? 'block' : 'none' }} onClick={() => setIsHideFunc(false)}>
             <img src={fold} />
           </div></>}
         </div>
-        <FlexDrag className='ide_console' minHeight={100} maxHeight={400} style={{ display: isHideBottom ? 'none' : 'flex' }} dragSides={['top']}>
-          <BottomConsole />
-        </FlexDrag>
+        {(!bottomContent) || <>
+          <FlexDrag className='ide_console' minHeight={100} maxHeight={400} style={{ display: isHideBottom ? 'none' : 'flex' }} dragSides={['top']}>
+            {bottomContent}
+          </FlexDrag>
+        </>}
         <div className='ide_console_open' style={{ display: isHideBottom ? 'block' : 'none' }} onClick={() => setIsHideBottom(false)}>
           <img src={downicon} />
         </div>
@@ -68,5 +68,5 @@ const Ide = ({
     </div>
   </div>;
 };
-// Ide.displayName = 'Ide';
-export default Ide;
+
+export default IdeComponent;
