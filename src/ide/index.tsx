@@ -18,13 +18,19 @@ const IdeComponent = ({
   leftNavMenuContent,
   leftNavContent,
   bottomContent,
-  rightContent
+  rightContent,
+  autoSaveSpace
 }: IdeProps) => {
-  const { ideTheme, dragType, isHideNav, setIsHideNav, isHideFunc, setIsHideFunc, isHideBottom, setIsHideBottom } = useIdeStore();
+  const { ideTheme, dragType, isHideNav, setIsHideNav, isHideFunc, setIsHideFunc, isHideBottom, setIsHideBottom, setAutoSaveSpace } = useIdeStore();
   const { setIdeEventListener } = useServerStore();
   useEffect(() => {
     setIdeEventListener(ideEventListener);
   }, [ideEventListener]);
+  useEffect(() => {
+    if (autoSaveSpace) {
+      setAutoSaveSpace(autoSaveSpace);
+    }
+  }, [autoSaveSpace]);
   return <div className={`ide_main ${ideTheme}_ide ${dragType || ''}`}>
     {(!headerContent) || <>
       <div className='ide_header'>

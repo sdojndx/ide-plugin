@@ -118,11 +118,15 @@ export interface IdeEventListener {
    * 自动保存文件，不设置则不自动保存
    * @param editorTab  当前编辑tab信息
    * @param doc 保存文件内容
-   * @returns
+   * @returns 空或者保存的文件内容（中间可能发生了代码各式化）
    */
   onFileAutoSave?: (editorTab:EditorItem, doc: string, cursorLine?: number, cursorCh?: number) => Promise<string|undefined>;
   /**
    * 接入自动补全
+   * @param editorTab  当前编辑tab信息
+   * @param cursorLine 光标所在的行
+   * @param cursorCh 光标所在行的具体位置
+   * @param doc 保存文件内容
    */
   autocomplete?: (editorTab:EditorItem, doc: string, cursorLine: number, cursorCh: number) => Promise<AutocompleteData[]>;
   /**
@@ -133,7 +137,9 @@ export interface IdeEventListener {
   fmt?: (param: FmtParam) => Promise<any>;
   /**
    * 接入切换到引用文件位置快捷键， tab+鼠标左键点击调用位置触发
-   * @param param
+   * @param editorTab  当前编辑tab信息
+   * @param cursorLine 光标所在的行
+   * @param cursorCh 光标所在行的具体位置
    * @returns
    */
   decl?: (editorTab:EditorItem, doc: string, cursorLine: number, cursorCh: number) => Promise<any>;
@@ -144,7 +150,7 @@ export interface IdeEventListener {
    */
   onGetFileContent:(editorTab: EditorItem) => Promise<string>;
   /**
-   * 当文件内容（不包括未报错） 变化时触发
+   * 当文件内容保存时触发
    * @param editorTab  当前编辑tab信息
    * @param orgDoc 文件内容
    * @returns

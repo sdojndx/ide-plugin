@@ -38,7 +38,7 @@ export default forwardRef(function CodeMirrorEditor({
   const dom = useRef<HTMLDivElement | null>(null);
   const editorView = useRef<EditorView | null>(null);
   const [hasLoadFile, setHasLoadFile] = useState<boolean>(false);
-  const { editorTheme, removeEditor, updateEditor } = useIdeStore();
+  const { editorTheme, removeEditor, updateEditor, autoSaveSpace } = useIdeStore();
   const { ideEventListener } = useServerStore();
   // 服务器端代码缓存
   const [orgDoc, setOrgDoc] = useState<string>('');
@@ -172,7 +172,7 @@ export default forwardRef(function CodeMirrorEditor({
 
     // ideEventListener?.onFileSave?.(editor, code, line, ch);
     const newCode = await ideEventListener.onFileSave?.(editor, code, line, ch);
-    console.log(newCode);
+    // console.log(newCode);
     if (newCode && newCode !== code) {
       editorView.current?.dispatch({
         changes: { from: 0, to: editorView.current.state.doc.length, insert: newCode }
@@ -256,7 +256,7 @@ export default forwardRef(function CodeMirrorEditor({
   }, [editorView, editor.lints]);
 
   useEffect(() => {
-    console.log([getFile, hasLoadFile, editor.action]);
+    // console.log([getFile, hasLoadFile, editor.action]);
     if (!hasLoadFile || !editor.action) {
       return;
     }
@@ -284,7 +284,7 @@ export default forwardRef(function CodeMirrorEditor({
     }
     const timer = setTimeout(() => {
       saveFile();
-    }, 10000);
+    }, autoSaveSpace);
     return () => clearTimeout(timer);
   }, [saveFile, ideEventListener?.onFileAutoSave]);
 
