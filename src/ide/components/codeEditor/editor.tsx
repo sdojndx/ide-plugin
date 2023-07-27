@@ -18,9 +18,11 @@ import completionSource from './autoCompletion';
 import { getLineAndChByPos, getPostByLineAndCh } from './tools';
 import { outLint } from './lint';
 import { useIdeStore } from '@ide/store';
-import { FILE_TYPES } from '@/zx_demo/utils/menu';
 import { useServerStore } from '@ide/store/serverStore';
 
+export const FILE_TYPES: string[] = [
+  'go', 'txt', 'md', 'mod', 'sum', 'java', 'sol', 'crt', 'pem', 'key', 'yml'
+];
 const fileTypeMap: any = {};
 FILE_TYPES.forEach(item => {
   fileTypeMap[item] = javascript;

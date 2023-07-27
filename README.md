@@ -101,7 +101,7 @@ $ npm run build-storybook
 
 ``` javascript
 
-import {IdeComponent} from 'ide-plugin-component';
+import {IdeComponent} from 'ide-plugin';
 
 <IdeComponent
   rightContentWidth={400}
@@ -226,7 +226,7 @@ import {IdeComponent} from 'ide-plugin-component';
 
 // 例如
 
-import {useIdeStore} from 'ide-plugin-component';
+import {useIdeStore} from 'ide-plugin';
 const ideStore = useIdeStore();
 ideStore.clearEditor();
 
