@@ -230,4 +230,8 @@ import {useIdeStore} from 'ide-plugin-component';
 const ideStore = useIdeStore();
 ideStore.clearEditor();
 
+// 结构说明
+
+。。。。
+
 ```
