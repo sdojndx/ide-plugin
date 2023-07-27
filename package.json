@@ -1,5 +1,5 @@
 {
-  "name": "ide-plugin",
+  "name": "@tencent/ide-plugin",
   "private": true,
   "version": "0.0.0",
   "type": "module",
