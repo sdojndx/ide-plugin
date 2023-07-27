@@ -111,14 +111,14 @@ export interface IdeEventListener {
    * 保存文件
    * @param editorTab  当前编辑tab信息
    * @param doc 保存文件内容
-   * @returns
+   * @returns 空或者保存的文件内容（中间可能发生了代码各式化,返回空则编辑区域保持原来保存内容，如果返回字符串将覆盖编辑区内容）
    */
   onFileSave?: (editorTab:EditorItem, doc: string, cursorLine?: number, cursorCh?: number) => Promise<string|undefined>;
   /**
    * 自动保存文件，不设置则不自动保存
    * @param editorTab  当前编辑tab信息
    * @param doc 保存文件内容
-   * @returns 空或者保存的文件内容（中间可能发生了代码各式化）
+   * @returns 空或者保存的文件内容（中间可能发生了代码各式化,返回空则编辑区域保持原来保存内容，如果返回字符串将覆盖编辑区内容）
    */
   onFileAutoSave?: (editorTab:EditorItem, doc: string, cursorLine?: number, cursorCh?: number) => Promise<string|undefined>;
   /**

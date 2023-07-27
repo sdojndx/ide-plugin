@@ -16,15 +16,15 @@ export default function CodeEditor() {
   const { ideEventListener } = useServerStore();
   const {
     ideFileTabs, removeEditor, openEditor,
-    isHideNav, isHideFunc, isHideBottom, setIsHideBottom, setIsHideFunc, setIsHideNav
+    isHideLeftContent, isHideRightContent, isHideBottomContent, setIsHideBottomContent, setIsHideRightContent, setIsHideLeftContent
   } = useIdeStore();
   // 初始化编辑文件选项
   // const [initEditer, setInitEditer] = useState(false);
   const refs = useRef<any[]>([]);
 
   const isFull = useMemo(() => {
-    return isHideBottom && isHideNav && isHideFunc;
-  }, [isHideNav, isHideFunc, isHideBottom]);
+    return isHideBottomContent && isHideLeftContent && isHideRightContent;
+  }, [isHideLeftContent, isHideRightContent, isHideBottomContent]);
   const rmEditor = useCallback(async (editor: EditorItem, e: React.MouseEvent) => {
     e.stopPropagation();
     if (editor.hasUnSave) {
@@ -49,9 +49,9 @@ export default function CodeEditor() {
     openEditor({ path });
   }, []);
   const switchFull = useCallback(() => {
-    setIsHideBottom(!isFull);
-    setIsHideFunc(!isFull);
-    setIsHideNav(!isFull);
+    setIsHideBottomContent(!isFull);
+    setIsHideRightContent(!isFull);
+    setIsHideLeftContent(!isFull);
   }, [isFull]);
   const saveFile = useCallback(() => {
     ideFileTabs.forEach((editor, index) => {

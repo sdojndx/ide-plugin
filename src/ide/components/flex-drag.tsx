@@ -1,5 +1,5 @@
 import { useIdeStore } from '@ide/store';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 interface Event {
   clientX: number;
@@ -13,7 +13,9 @@ export default function FlexDrag({
   minHeight,
   maxHeight,
   minWidth,
-  maxWidth
+  maxWidth,
+  widthNum,
+  HeightNum
 }: {
   className?: string;
   dragSides?: string[];
@@ -23,9 +25,11 @@ export default function FlexDrag({
   maxWidth?: number;
   minHeight?: number;
   maxHeight?: number;
+  widthNum?: number;
+  HeightNum?: number;
 }) {
-  const [width, setWidth] = useState<number | undefined>();
-  const [height, setHeight] = useState<number | undefined>();
+  const [width, setWidth] = useState<number | undefined>(widthNum);
+  const [height, setHeight] = useState<number | undefined>(HeightNum);
   const [isActive, setIsActive] = useState<boolean>(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const { setDragType } = useIdeStore();
@@ -47,6 +51,14 @@ export default function FlexDrag({
     }
     setHeight(heigth);
   }, [setHeight]);
+
+  useEffect(() => {
+    setWidth(widthNum);
+  }, [widthNum]);
+
+  useEffect(() => {
+    setHeight(HeightNum);
+  }, [HeightNum]);
 
   const startDrag = useCallback((event: Event, side: string) => {
     if (!contentRef.current) {

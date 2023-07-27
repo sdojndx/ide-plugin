@@ -131,6 +131,10 @@ export type EditorStore = EditorData & {
    * @returns
    */
   removeEditorById: (id: string) => void;
+  /**
+   * 清空所有编辑文件节点tab
+   */
+  clearEditor:()=>void;
   // updateLints: (item: EditorData['lints']) => void;
 };
 
@@ -269,7 +273,10 @@ export const editorStore: StateCreator<EditorStore> = (set) => ({
       };
     });
     return { ideFileTabs };
-  })
+  }),
+  clearEditor: () => set(() => ({
+    ideFileTabs: []
+  }))
   // updateLints: (item) => set(() => ({
   //   lints: item
   // }))

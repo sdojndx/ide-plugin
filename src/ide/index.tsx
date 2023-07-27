@@ -16,12 +16,15 @@ const IdeComponent = ({
   ideEventListener,
   headerContent,
   leftNavMenuContent,
-  leftNavContent,
+  leftContent,
+  leftNavContentWidth,
   bottomContent,
+  bottomContentHeight,
   rightContent,
+  rightContentWidth,
   autoSaveSpace
 }: IdeProps) => {
-  const { ideTheme, dragType, isHideNav, setIsHideNav, isHideFunc, setIsHideFunc, isHideBottom, setIsHideBottom, setAutoSaveSpace } = useIdeStore();
+  const { ideTheme, dragType, isHideLeftContent, setIsHideLeftContent, isHideRightContent, setIsHideRightContent, isHideBottomContent, setIsHideBottomContent, setAutoSaveSpace, hasLeftContent, hasRightContent, hasBottomContent, setHasLeftContent, setHasRightContent, setHasBottomContent } = useIdeStore();
   const { setIdeEventListener } = useServerStore();
   useEffect(() => {
     setIdeEventListener(ideEventListener);
@@ -31,6 +34,21 @@ const IdeComponent = ({
       setAutoSaveSpace(autoSaveSpace);
     }
   }, [autoSaveSpace]);
+  useEffect(() => {
+    if (!!leftContent !== hasLeftContent) {
+      setHasLeftContent(!!leftContent);
+    }
+  }, [leftContent, hasLeftContent]);
+  useEffect(() => {
+    if (!!rightContent !== hasRightContent) {
+      setHasRightContent(!!rightContent);
+    }
+  }, [rightContent]);
+  useEffect(() => {
+    if (!!bottomContent !== hasBottomContent) {
+      setHasBottomContent(!!bottomContent);
+    }
+  }, [bottomContent]);
   return <div className={`ide_main ${ideTheme}_ide ${dragType || ''}`}>
     {(!headerContent) || <>
       <div className='ide_header'>
@@ -42,11 +60,11 @@ const IdeComponent = ({
       {(!leftNavMenuContent) || <div className='ide_tools'>
         {leftNavMenuContent}
       </div>}
-      {(!leftNavContent) || <>
-        <FlexDrag className='ide_nav' dragSides={['right']} minWidth={240} maxWidth={400} style={{ display: isHideNav ? 'none' : 'flex' }}>
-          {leftNavContent}
+      {(!leftContent) || <>
+        <FlexDrag className='ide_left' dragSides={['right']} widthNum={leftNavContentWidth} minWidth={240} maxWidth={400} style={{ display: isHideLeftContent ? 'none' : 'flex' }}>
+          {leftContent}
         </FlexDrag>
-        <div className='ide_nav_open' style={{ display: isHideNav ? 'block' : 'none' }} onClick={() => setIsHideNav(false)}>
+        <div className='ide_nav_open' style={{ display: isHideLeftContent ? 'block' : 'none' }} onClick={() => setIsHideLeftContent(false)}>
           <img src={righticon} />
         </div>
       </>}
@@ -55,21 +73,23 @@ const IdeComponent = ({
           <div className='flex_one'>
             <CodeEditor />
           </div>
-          {(!rightContent) || <><FlexDrag className='ide_func' dragSides={['left']} minWidth={200} maxWidth={400} style={{ display: isHideFunc ? 'none' : 'flex' }}>
-            {rightContent}
-          </FlexDrag>
-          <div className='ide_func_open' style={{ display: isHideFunc ? 'block' : 'none' }} onClick={() => setIsHideFunc(false)}>
-            <img src={fold} />
-          </div></>}
+          {(!rightContent) || <>
+            <FlexDrag className='ide_right' widthNum={rightContentWidth} dragSides={['left']} minWidth={200} maxWidth={600} style={{ display: isHideRightContent ? 'none' : 'flex' }}>
+              {rightContent}
+            </FlexDrag>
+            <div className='ide_func_open' style={{ display: isHideRightContent ? 'block' : 'none' }} onClick={() => setIsHideRightContent(false)}>
+              <img src={fold} />
+            </div>
+          </>}
         </div>
         {(!bottomContent) || <>
-          <FlexDrag className='ide_console' minHeight={100} maxHeight={400} style={{ display: isHideBottom ? 'none' : 'flex' }} dragSides={['top']}>
+          <FlexDrag className='ide_bottom' HeightNum={bottomContentHeight} minHeight={100} maxHeight={500} style={{ display: isHideBottomContent ? 'none' : 'flex' }} dragSides={['top']}>
             {bottomContent}
           </FlexDrag>
+          <div className='ide_console_open' style={{ display: isHideBottomContent ? 'block' : 'none' }} onClick={() => setIsHideBottomContent(false)}>
+            <img src={downicon} />
+          </div>
         </>}
-        <div className='ide_console_open' style={{ display: isHideBottom ? 'block' : 'none' }} onClick={() => setIsHideBottom(false)}>
-          <img src={downicon} />
-        </div>
       </div>
     </div>
   </div>;

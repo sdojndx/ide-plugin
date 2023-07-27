@@ -27,15 +27,27 @@ export interface IdeProps{
   /**
    * 左导航功能区模块 （一般为随左导航切换的功能区域）
    */
-  leftNavContent?: React.ReactNode;
+  leftContent?: React.ReactNode;
+  /**
+   * 左导航功能区模块默认宽度
+   */
+  leftNavContentWidth?: number;
   /**
    * 编辑区右侧区域模块
    */
   rightContent?: React.ReactNode;
   /**
+   * 编辑区右侧区域模块宽度
+   */
+  rightContentWidth?: number;
+  /**
    *  底部日志区域模块，不传则不展示
    */
   bottomContent?: React.ReactNode;
+  /**
+   * 底部日志区域模块默认高度
+   */
+  bottomContentHeight?: number;
   /**
    * 自动保存的时间间隔
    */

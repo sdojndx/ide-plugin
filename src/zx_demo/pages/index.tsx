@@ -221,7 +221,7 @@ export default function Home() {
               navList={navList}
             />
           }
-          leftNavContent={
+          leftContent={
             <SideTab navList={navList}/>
           }
           rightContent={

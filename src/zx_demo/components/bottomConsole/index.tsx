@@ -136,7 +136,7 @@ export default function BottomConsole() {
   };
   // const [currentTab, setCurrentTab] = useState<'output' | 'event' | 'worldstate'>('output')
   const { currentTab, setCurrentTab } = useAppStore();
-  const { setIsHideBottom } = useIdeStore();
+  const { setIsHideBottomContent } = useIdeStore();
 
   const clearConsole = useCallback(() => {
     if (currentTab) {
@@ -181,7 +181,7 @@ export default function BottomConsole() {
             )
           }
           <span className="clear-all" title="清除" onClick={clearConsole}>清除</span>
-          <span className="down-icon ico-min" onClick={() => setIsHideBottom(true)}></span>
+          <span className="down-icon ico-min" onClick={() => setIsHideBottomContent(true)}></span>
         </span>
       </div>
 

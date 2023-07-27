@@ -8,7 +8,7 @@ export default {
     lib: {
       entry: resolve(__dirname, '../src/index.ts'),
       name: 'ide-plugin',
-      fileName: 'ide-plugin'
+      fileName: 'index'
     },
     rollupOptions: {
       // 确保外部化处理那些你不想打包进库的依赖

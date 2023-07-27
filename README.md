@@ -96,3 +96,138 @@ $ npm run storybook
 $ npm run build-storybook
 
 ```
+
+## 引入方式
+
+``` javascript
+
+import {IdeComponent} from 'ide-plugin-component';
+
+<IdeComponent
+  rightContentWidth={400}
+  headerContent={<IdeHeader/>} 
+  leftContent={<FileNav/>}
+  rightContent={<IdeGuide/>}
+  bottomContent={<BottomConsole />}
+  ideEventListener={ideEventListener}/>
+
+// 参数说明
+
+{
+  /**
+   * ide顶部模块
+   */
+  headerContent?: React.ReactNode;
+  /**
+   * ide组件的事件监听函数
+   * @returns
+   */
+  ideEventListener: IdeEventListener,
+  userId?: string | number;
+  /**
+   * 左导航模块,如果不传则页面不展示这个模块 （可切换的导航）
+   */
+  leftNavMenuContent?: React.ReactNode;
+  /**
+   * 左导航功能区模块 （一般为随左导航切换的功能区域）
+   */
+  leftContent?: React.ReactNode;
+  /**
+   * 左导航功能区模块默认宽度
+   */
+  leftNavContentWidth?: number;
+  /**
+   * 编辑区右侧区域模块
+   */
+  rightContent?: React.ReactNode;
+  /**
+   * 编辑区右侧区域模块宽度
+   */
+  rightContentWidth?: number;
+  /**
+   *  底部日志区域模块，不传则不展示
+   */
+  bottomContent?: React.ReactNode;
+  /**
+   * 底部日志区域模块默认高度
+   */
+  bottomContentHeight?: number;
+  /**
+   * 自动保存的时间间隔
+   */
+  autoSaveSpace?: number;
+}
+
+// IdeEventListener 结构
+
+{
+  /**
+   * 保存文件
+   * @param editorTab  当前编辑tab信息
+   * @param doc 保存文件内容
+   * @returns 空或者保存的文件内容（中间可能发生了代码各式化,返回空则编辑区域保持原来保存内容，如果返回字符串将覆盖编辑区内容）
+   */
+  onFileSave?: (editorTab:EditorItem, doc: string, cursorLine?: number, cursorCh?: number) => Promise<string|undefined>;
+  /**
+   * 自动保存文件，不设置则不自动保存
+   * @param editorTab  当前编辑tab信息
+   * @param doc 保存文件内容
+   * @returns 空或者保存的文件内容（中间可能发生了代码各式化,返回空则编辑区域保持原来保存内容，如果返回字符串将覆盖编辑区内容）
+   */
+  onFileAutoSave?: (editorTab:EditorItem, doc: string, cursorLine?: number, cursorCh?: number) => Promise<string|undefined>;
+  /**
+   * 接入自动补全
+   * @param editorTab  当前编辑tab信息
+   * @param cursorLine 光标所在的行
+   * @param cursorCh 光标所在行的具体位置
+   * @param doc 保存文件内容
+   */
+  autocomplete?: (editorTab:EditorItem, doc: string, cursorLine: number, cursorCh: number) => Promise<AutocompleteData[]>;
+  /**
+   * 美化代码
+   * @param param
+   * @returns
+   */
+  fmt?: (param: FmtParam) => Promise<any>;
+  /**
+   * 接入切换到引用文件位置快捷键， tab+鼠标左键点击调用位置触发
+   * @param editorTab  当前编辑tab信息
+   * @param cursorLine 光标所在的行
+   * @param cursorCh 光标所在行的具体位置
+   * @returns
+   */
+  decl?: (editorTab:EditorItem, doc: string, cursorLine: number, cursorCh: number) => Promise<any>;
+  /**
+   * 获取当前编辑页面的代码内容
+   * @param editorTab  当前编辑tab信息
+   * @returns  当前编辑文件内容
+   */
+  onGetFileContent:(editorTab: EditorItem) => Promise<string>;
+  /**
+   * 当文件内容保存时触发
+   * @param editorTab  当前编辑tab信息
+   * @param orgDoc 文件内容
+   * @returns
+   */
+  onFileContentUpdate: (editorTab:EditorItem, orgDoc: string) => void;
+  /**
+   * 点击字体扩大按钮
+   * @returns
+   */
+  onAddFontSize?: ()=>void;
+  /**
+   * 点击字体缩小按钮
+   * @returns
+   */
+  onReduceFontSize?: ()=>void;
+}
+
+// ide数据通过 引入useIdeStore 的方法操作
+
+// 例如
+
+import {useIdeStore} from 'ide-plugin-component';
+const ideStore = useIdeStore();
+ideStore.clearEditor();
+
+```

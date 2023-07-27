@@ -18,7 +18,7 @@ export default function SideTab({
 }:{
   navList:SideNavs[]
 }) {
-  const { setIsHideNav } = useIdeStore();
+  const { setIsHideLeftContent } = useIdeStore();
   const { activeTab, activeTreeNode, setAlartModalContent } = useAppStore();
   const fileInput = useRef<HTMLInputElement | null>(null);
   const { contract, getFiles } = useAppStore();
@@ -80,7 +80,7 @@ export default function SideTab({
           className="upload-files"
           style={{ width: 0, height: 0, opacity: 0 }} />
       </div>
-      <img src={fold} className='nav_action' onClick={() => setIsHideNav(true)} />
+      <img src={fold} className='nav_action' onClick={() => setIsHideLeftContent(true)} />
     </div>
     <div className='ide_nav_c'>
       {

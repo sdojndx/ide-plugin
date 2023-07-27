@@ -1,22 +1,22 @@
 {
-  "name": "ide-plugin",
+  "name": "ide-plugin-component",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "files": [
     "dist"
   ],
-  "main": "./dist/ide-plugin.umd.cjs",
-  "module": "./dist/ide-plugin.js",
+  "main": "./dist/index.umd.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git@git.woa.com:CVMFETeam/ide-plugin.git"
+    "url": "git@git.woa.com:CVMFETeam/ide_plugin.git"
   },
   "exports": {
     ".": {
-      "import": "./dist/ide-plugin.js",
-      "require": "./dist/ide-plugin.umd.cjs"
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.cjs"
     },
     "./style.css": "./dist/style.css"
   },

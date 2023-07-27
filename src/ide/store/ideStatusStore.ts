@@ -9,18 +9,25 @@ interface IdeStatus {
   // 拖拽类型
   dragType?: string;
   // 是否隐藏导航栏
-  isHideNav?: boolean;
-  isHideFunc: boolean;
-  isHideBottom: boolean;
+  isHideLeftContent?: boolean;
+  isHideRightContent?: boolean;
+  isHideBottomContent?: boolean;
+  // 是否隐藏导航栏
+  hasLeftContent?: boolean;
+  hasRightContent?: boolean;
+  hasBottomContent?: boolean;
   // 自动保存检测时间间隔 毫秒
   autoSaveSpace: number;
 }
 
 const initData = {
   dragType: undefined,
-  isHideNav: false,
-  isHideFunc: false,
-  isHideBottom: false,
+  isHideLeftContent: false,
+  isHideRightContent: false,
+  isHideBottomContent: false,
+  hasLeftContent: false,
+  hasRightContent: false,
+  hasBottomContent: false,
   autoSaveSpace: 10000
 };
 
@@ -36,19 +43,38 @@ export type IdeStatusStore = IdeStatus & {
    * @param isHide
    * @returns
    */
-  setIsHideNav: (isHide?: boolean) => void;
+  setIsHideLeftContent: (isHide?: boolean) => void;
   /**
    * 设置是否隐藏右边自定义内容
    * @param isHide
    * @returns
    */
-  setIsHideFunc: (isHide?: boolean) => void;
+  setIsHideRightContent: (isHide?: boolean) => void;
   /**
    * 设置是否隐藏底部自定义内容
    * @param visible
    * @returns
    */
-  setIsHideBottom: (visible: boolean) => void;
+  setIsHideBottomContent: (visible: boolean) => void;
+
+  /**
+   * 设置是否隐藏左边自定义内容
+   * @param has
+   * @returns
+   */
+  setHasLeftContent: (has?: boolean) => void;
+  /**
+   * 设置是否隐藏右边自定义内容
+   * @param has
+   * @returns
+   */
+  setHasRightContent: (has?: boolean) => void;
+  /**
+   * 设置是否隐藏底部自定义内容
+   * @param has
+   * @returns
+   */
+  setHasBottomContent: (has: boolean) => void;
   /**
    * 设置自动保存时间间隔
    * @param time 时间间隔
@@ -61,16 +87,31 @@ export const ideStatusStore: StateCreator<IdeStatusStore> = (set) => ({
   setDragType: (type) => set(() => ({
     dragType: type
   })),
-  setIsHideNav: (isHide) => set(() => ({
-    isHideNav: isHide
-  })),
-  setIsHideFunc: (isHide) => set(() => ({
-    isHideFunc: isHide
-  })),
-  setIsHideBottom: (isHide) => set(() => ({
-    isHideBottom: isHide
-  })),
+  setIsHideLeftContent: (isHide) => set((state) => {
+    return {
+      isHideLeftContent: state.hasLeftContent ? isHide : true
+    };
+  }),
+  setIsHideRightContent: (isHide) => set((state) => {
+    return {
+      isHideRightContent: state.hasRightContent ? isHide : true
+    };
+  }),
+  setIsHideBottomContent: (isHide) => set((state) => {
+    return {
+      isHideBottomContent: state.hasBottomContent ? isHide : true
+    };
+  }),
   setAutoSaveSpace: (time) => set(() => ({
     autoSaveSpace: time
+  })),
+  setHasLeftContent: (has) => set(() => ({
+    hasLeftContent: has
+  })),
+  setHasRightContent: (has) => set(() => ({
+    hasRightContent: has
+  })),
+  setHasBottomContent: (has) => set(() => ({
+    hasBottomContent: has
   }))
 });

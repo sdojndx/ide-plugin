@@ -5,10 +5,10 @@ import React from 'react';
 
 export default function Structure() {
   const { ideFileTabs } = useIdeStore();
-  const { setIsHideFunc } = useIdeStore();
+  const { setIsHideRightContent } = useIdeStore();
   return <>
     <div className='func_header'>
-      <img src={righticon} className='nav_action' onClick={() => setIsHideFunc(true)} />
+      <img src={righticon} className='nav_action' onClick={() => setIsHideRightContent(true)} />
     </div>
     <div className='ide_func_c'>
       <div className='func_ls'>
