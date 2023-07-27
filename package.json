@@ -1,6 +1,6 @@
 {
   "name": "@tencent/ide-plugin",
-  "private": true,
+  "description": "开放的ide页面开发模版组件",
   "version": "1.0.0",
   "type": "module",
   "files": [
