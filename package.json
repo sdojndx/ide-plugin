@@ -1,5 +1,5 @@
 {
-  "name": "@tencent/ide-plugin",
+  "name": "ide-plugin",
   "description": "开放的ide页面开发模版组件",
   "version": "1.0.0",
   "type": "module",
@@ -11,7 +11,7 @@
   "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git@git.woa.com:CVMFETeam/ide_plugin.git"
+    "url": "git@github.com:sdojndx/ide-plugin.git"
   },
   "exports": {
     ".": {
