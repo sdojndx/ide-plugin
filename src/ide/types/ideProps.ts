@@ -52,4 +52,8 @@ export interface IdeProps{
    * 自动保存的时间间隔
    */
   autoSaveSpace?: number;
+  /**
+   * 文件编辑列表右侧操作区内容
+   */
+  codeOptionContent?:React.ReactNode;
 }

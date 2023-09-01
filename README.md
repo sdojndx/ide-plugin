@@ -156,6 +156,10 @@ import {IdeComponent} from 'ide-plugin';
    * 自动保存的时间间隔
    */
   autoSaveSpace?: number;
+  /**
+   * 文件编辑文件tab右侧操作区内容
+   */
+  codeOptionContent?:React.ReactNode;
 }
 
 // IdeEventListener 结构
@@ -204,12 +208,12 @@ import {IdeComponent} from 'ide-plugin';
    */
   onGetFileContent:(editorTab: EditorItem) => Promise<string>;
   /**
-   * 当文件内容保存时触发
+   * 当文件内容加载完毕或更新时触发
    * @param editorTab  当前编辑tab信息
-   * @param orgDoc 文件内容
+   * @param doc 文件内容
    * @returns
    */
-  onFileContentUpdate: (editorTab:EditorItem, orgDoc: string) => void;
+  onFileContentUpdate?: (editorTab:EditorItem, doc: string) => void;
   /**
    * 点击字体扩大按钮
    * @returns
@@ -235,3 +239,12 @@ ideStore.clearEditor();
 。。。。
 
 ```
+
+
+
+v1.1.0
+
+IDE组件去除 leftNavMenuContent，leftNavContentWidth， bottomContentHeight属性，改为ideStore 里的leftContentSize,rightContentSize,bottomContentSize控制大小。
+ideStore 添加 currentFileTab 当前编辑的文件信息。
+添加codeOptionContent 支持自定义编辑文件tab右侧操作区内容
+IdeFileTabItemProp 标签的action 添加保存文件 saveFile 类型

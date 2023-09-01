@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 export interface Lint {
   lineNo: string;
   file: string;
+  fromCol?: string;
+  toCol?: string;
   severity: 'info' | 'warning' | 'error';
   msg: string;
 }
@@ -31,14 +33,18 @@ export interface IdeFileTabItemProp {
   isVisible?: boolean;
   /**
    * 驱动编辑区行为数据
+   * cursor 鼠标聚焦指定位置
+   * updateCode 更新代码到最新
+   * saveFile 保存代码
    */
   action?: {
     Line: number,
     Ch: number,
     type: 'cursor';
   } | {
-    v: number,
     type: 'updateCode'
+  } | {
+    type: 'saveFile'
   };
   /**
    * 文件警告信息
@@ -74,6 +80,11 @@ interface EditorData {
   // lints: {
   //   [key: string]: Lint[]
   // };
+
+  /**
+   * 当前打开的选项卡
+   */
+  currentFileTab?: IdeFileTabItemProp;
   /**
    * 文件打开记录
    */
@@ -140,42 +151,57 @@ export type EditorStore = EditorData & {
 
 export const editorStore: StateCreator<EditorStore> = (set) => ({
   ...initDate,
-  setEditors: (ls) => set((state) => ({
-    ...state,
-    ideFileTabs: ls
-  })),
+  setEditors: (ls) => set((state) => {
+    const currentFileTab = ls.find(item => item.isVisible);
+    const history = state.history.slice();
+    if (currentFileTab?.path && history[history.length - 1] !== currentFileTab?.path) {
+      history.push(currentFileTab.path);
+    }
+    // (state as IdeStore).getGoModuleFiles(ls.find(item => item.isVisible)?.path);
+    return {
+      ideFileTabs: ls,
+      currentFileTab,
+      history
+    };
+  }),
   openEditor: (item) => set((state) => {
     const editorlist = state.ideFileTabs;
     const history = state.history.slice();
     let hasOpen = false;
     const name = item.name || item.path.match(/[^/]+$/)?.[0];
     item.fileType = item.fileType || item.path.match(/[^.]+$/)?.[0];
+
+    let currentFileTab;
     const ideFileTabs = editorlist.map(editor => {
       if (editor.path === item.path) {
         hasOpen = true;
-        return {
+        currentFileTab = {
           ...editor,
           ...item,
+          name: editor.name || name,
           isVisible: true
         };
+        return currentFileTab;
       }
       editor.isVisible = false;
       return editor;
     });
     if (!hasOpen) {
-      ideFileTabs.push({
+      currentFileTab = {
         ...item,
         name,
         isVisible: true,
         id: uuidv4()
-      });
+      };
+      ideFileTabs.push(currentFileTab);
     }
 
     history.push(item.path);
-    return { ideFileTabs, history };
+    return { ideFileTabs, currentFileTab, history };
   }),
   // 移除编辑文件
   removeEditor: (path) => set((state) => {
+    let currentFileTab;
     const ideFileTabs = state.ideFileTabs.slice();
     const history = state.history.slice();
     const index = ideFileTabs.findIndex(editor => editor.path === path);
@@ -193,12 +219,12 @@ export const editorStore: StateCreator<EditorStore> = (set) => ({
     const editor = ideFileTabs.find(editor => editor.isVisible);
     if (!editor) {
       const p = history[history.length - 1];
-      const edit = ideFileTabs.find(editor => editor.path === p);
-      if (edit) {
-        edit.isVisible = true;
+      const currentFileTab = ideFileTabs.find(editor => editor.path === p);
+      if (currentFileTab) {
+        currentFileTab.isVisible = true;
       }
     }
-    return { ideFileTabs, history };
+    return { ideFileTabs, history, currentFileTab };
   }),
   // 移除编辑文件
   removeEditorById: (id) => set((state) => {

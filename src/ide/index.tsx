@@ -17,14 +17,20 @@ const IdeComponent = ({
   headerContent,
   leftNavMenuContent,
   leftContent,
-  leftNavContentWidth,
+  // leftNavContentWidth,
   bottomContent,
-  bottomContentHeight,
+  // bottomContentHeight,
   rightContent,
-  rightContentWidth,
-  autoSaveSpace
+  // rightContentWidth,
+  autoSaveSpace,
+  codeOptionContent
 }: IdeProps) => {
-  const { ideTheme, dragType, isHideLeftContent, setIsHideLeftContent, isHideRightContent, setIsHideRightContent, isHideBottomContent, setIsHideBottomContent, setAutoSaveSpace, hasLeftContent, hasRightContent, hasBottomContent, setHasLeftContent, setHasRightContent, setHasBottomContent } = useIdeStore();
+  const {
+    ideTheme, dragType, isHideLeftContent, setIsHideLeftContent, isHideRightContent, setIsHideRightContent,
+    isHideBottomContent, setIsHideBottomContent, setAutoSaveSpace, hasLeftContent, hasRightContent, hasBottomContent,
+    setHasLeftContent, setHasRightContent, setHasBottomContent, leftContentSize, rightContentSize, bottomContentSize,
+    setLeftContentSize, setRightContentSize, setBottomContentSize
+  } = useIdeStore();
   const { setIdeEventListener } = useServerStore();
   useEffect(() => {
     setIdeEventListener(ideEventListener);
@@ -61,7 +67,7 @@ const IdeComponent = ({
         {leftNavMenuContent}
       </div>}
       {(!leftContent) || <>
-        <FlexDrag className='ide_left' dragSides={['right']} widthNum={leftNavContentWidth} minWidth={240} maxWidth={400} style={{ display: isHideLeftContent ? 'none' : 'flex' }}>
+        <FlexDrag className='ide_left' dragSides={['right']} width={leftContentSize} setWidth={setLeftContentSize} minWidth={240} maxWidth={400} style={{ display: isHideLeftContent ? 'none' : 'flex' }}>
           {leftContent}
         </FlexDrag>
         <div className='ide_nav_open' style={{ display: isHideLeftContent ? 'block' : 'none' }} onClick={() => setIsHideLeftContent(false)}>
@@ -71,10 +77,10 @@ const IdeComponent = ({
       <div className='flex_col flex_one'>
         <div className='flex_one'>
           <div className='flex_one'>
-            <CodeEditor />
+            <CodeEditor codeOptionContent={codeOptionContent}/>
           </div>
           {(!rightContent) || <>
-            <FlexDrag className='ide_right' widthNum={rightContentWidth} dragSides={['left']} minWidth={200} maxWidth={600} style={{ display: isHideRightContent ? 'none' : 'flex' }}>
+            <FlexDrag className='ide_right' width={rightContentSize} setWidth={setRightContentSize} dragSides={['left']} minWidth={200} maxWidth={600} style={{ display: isHideRightContent ? 'none' : 'flex' }}>
               {rightContent}
             </FlexDrag>
             <div className='ide_func_open' style={{ display: isHideRightContent ? 'block' : 'none' }} onClick={() => setIsHideRightContent(false)}>
@@ -83,7 +89,7 @@ const IdeComponent = ({
           </>}
         </div>
         {(!bottomContent) || <>
-          <FlexDrag className='ide_bottom' HeightNum={bottomContentHeight} minHeight={100} maxHeight={500} style={{ display: isHideBottomContent ? 'none' : 'flex' }} dragSides={['top']}>
+          <FlexDrag className='ide_bottom' height={bottomContentSize} setHeight={setBottomContentSize} minHeight={100} maxHeight={500} style={{ display: isHideBottomContent ? 'none' : 'flex' }} dragSides={['top']}>
             {bottomContent}
           </FlexDrag>
           <div className='ide_console_open' style={{ display: isHideBottomContent ? 'block' : 'none' }} onClick={() => setIsHideBottomContent(false)}>

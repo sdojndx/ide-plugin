@@ -16,7 +16,7 @@ interface StyleData {
 const initDate = {
   ideStyle: {},
   ideTheme: 'dark',
-  editorTheme: 'abcdef',
+  editorTheme: 'vscodeDark',
   canChangeFontSize: true
 };
 export type StyleDataStore = StyleData & {

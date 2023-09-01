@@ -1,5 +1,5 @@
-import { useIdeStore } from '@ide/store';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
+import { useIdeStore } from '../store';
 
 interface Event {
   clientX: number;
@@ -14,8 +14,10 @@ export default function FlexDrag({
   maxHeight,
   minWidth,
   maxWidth,
-  widthNum,
-  HeightNum
+  width,
+  height,
+  setWidth,
+  setHeight
 }: {
   className?: string;
   dragSides?: string[];
@@ -25,11 +27,11 @@ export default function FlexDrag({
   maxWidth?: number;
   minHeight?: number;
   maxHeight?: number;
-  widthNum?: number;
-  HeightNum?: number;
+  width?: number;
+  height?: number;
+  setWidth?:(width:number)=>void;
+  setHeight?:(height:number)=>void;
 }) {
-  const [width, setWidth] = useState<number | undefined>(widthNum);
-  const [height, setHeight] = useState<number | undefined>(HeightNum);
   const [isActive, setIsActive] = useState<boolean>(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const { setDragType } = useIdeStore();
@@ -40,25 +42,17 @@ export default function FlexDrag({
     if (minWidth && width < minWidth) {
       width = minWidth;
     }
-    setWidth(width);
+    setWidth?.(width);
   }, [setWidth]);
-  const updateHeight = useCallback((heigth: number) => {
-    if (maxHeight && heigth > maxHeight) {
-      heigth = maxHeight;
+  const updateHeight = useCallback((height: number) => {
+    if (maxHeight && height > maxHeight) {
+      height = maxHeight;
     }
-    if (minHeight && heigth < minHeight) {
-      heigth = minHeight;
+    if (minHeight && height < minHeight) {
+      height = minHeight;
     }
-    setHeight(heigth);
+    setHeight?.(height);
   }, [setHeight]);
-
-  useEffect(() => {
-    setWidth(widthNum);
-  }, [widthNum]);
-
-  useEffect(() => {
-    setHeight(HeightNum);
-  }, [HeightNum]);
 
   const startDrag = useCallback((event: Event, side: string) => {
     if (!contentRef.current) {

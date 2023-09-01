@@ -150,12 +150,12 @@ export interface IdeEventListener {
    */
   onGetFileContent:(editorTab: EditorItem) => Promise<string>;
   /**
-   * 当文件内容保存时触发
+   * 当文件内容加载完毕或更新时触发
    * @param editorTab  当前编辑tab信息
-   * @param orgDoc 文件内容
+   * @param doc 文件内容
    * @returns
    */
-  onFileContentUpdate: (editorTab:EditorItem, orgDoc: string) => void;
+  onFileContentUpdate?: (editorTab:EditorItem, doc: string) => void;
   /**
    * 点击字体扩大按钮
    * @returns

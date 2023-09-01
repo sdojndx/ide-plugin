@@ -16,6 +16,10 @@ interface IdeStatus {
   hasLeftContent?: boolean;
   hasRightContent?: boolean;
   hasBottomContent?: boolean;
+  // 模块尺寸管理
+  leftContentSize?: number;
+  rightContentSize?: number;
+  bottomContentSize?: number;
   // 自动保存检测时间间隔 毫秒
   autoSaveSpace: number;
 }
@@ -28,6 +32,9 @@ const initData = {
   hasLeftContent: false,
   hasRightContent: false,
   hasBottomContent: false,
+  leftContentSize: 300,
+  rightContentSize: 240,
+  bottomContentSize: 200,
   autoSaveSpace: 10000
 };
 
@@ -76,6 +83,24 @@ export type IdeStatusStore = IdeStatus & {
    */
   setHasBottomContent: (has: boolean) => void;
   /**
+   * 设置左边自定义内容区域尺寸
+   * @param size
+   * @returns
+   */
+  setLeftContentSize: (size: number)=>void;
+  /**
+   * 设置右边自定义内容区域尺寸
+   * @param size
+   * @returns
+   */
+  setRightContentSize: (size: number)=>void;
+  /**
+   * 设置底部自定义内容区域尺寸
+   * @param size
+   * @returns
+   */
+  setBottomContentSize: (size: number)=>void;
+  /**
    * 设置自动保存时间间隔
    * @param time 时间间隔
    * @returns
@@ -113,5 +138,14 @@ export const ideStatusStore: StateCreator<IdeStatusStore> = (set) => ({
   })),
   setHasBottomContent: (has) => set(() => ({
     hasBottomContent: has
+  })),
+  setLeftContentSize: (size) => set(() => ({
+    leftContentSize: size
+  })),
+  setRightContentSize: (size) => set(() => ({
+    rightContentSize: size
+  })),
+  setBottomContentSize: (size) => set(() => ({
+    bottomContentSize: size
   }))
 });

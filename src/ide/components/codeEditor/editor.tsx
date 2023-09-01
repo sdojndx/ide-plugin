@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { EditorState, Compartment, EditorSelection } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { StreamLanguage } from '@codemirror/language';
@@ -28,7 +28,7 @@ FILE_TYPES.forEach(item => {
   fileTypeMap[item] = javascript;
 });
 
-export default forwardRef(function CodeMirrorEditor({
+export default function CodeMirrorEditor({
   editor,
   className,
   style
@@ -36,7 +36,7 @@ export default forwardRef(function CodeMirrorEditor({
   editor: EditorItem;
   className?: string;
   style?: React.CSSProperties;
-}, refs) {
+}) {
   const dom = useRef<HTMLDivElement | null>(null);
   const editorView = useRef<EditorView | null>(null);
   const [hasLoadFile, setHasLoadFile] = useState<boolean>(false);
@@ -211,7 +211,7 @@ export default forwardRef(function CodeMirrorEditor({
   }, [orgDoc, hasLoadFile, editor.id]);
   // 更新校验
   const decl = useCallback((event?: MouseEvent) => {
-    if (!event || !editorView.current || !ideEventListener?.decl || editor.fileType !== 'go') {
+    if (!event || !editorView.current || !ideEventListener?.decl) {
       return;
     }
     const code = editorView.current.state.doc.toString() || '';
@@ -275,10 +275,13 @@ export default forwardRef(function CodeMirrorEditor({
       case 'updateCode':
         getFile();
         break;
+      case 'saveFile':
+        save();
+        break;
       default:
         break;
     }
-  }, [getFile, hasLoadFile, editor.action]);
+  }, [hasLoadFile, editor.action]);
 
   useEffect(() => {
     if (!ideEventListener?.onFileAutoSave) {
@@ -290,11 +293,11 @@ export default forwardRef(function CodeMirrorEditor({
     return () => clearTimeout(timer);
   }, [saveFile, ideEventListener?.onFileAutoSave]);
 
-  useImperativeHandle(refs, () => ({
-    save
-  }));
+  // useImperativeHandle(refs, () => ({
+  //   save
+  // }));
 
   return (
     <div style={editorStyle} className={className} ref={dom}></div>
   );
-});
+};
