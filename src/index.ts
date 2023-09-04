@@ -1,15 +1,11 @@
 import IdeComponent from './ide/index.tsx';
-import { useIdeStore, IdeStore } from './ide/store/index.ts';
-import { IdeProps } from './ide/types';
-import theme from './ide/components/codeEditor/theme.ts'
-export type * from './ide/types/index.ts';
+import { useIdeStore } from './ide/store/index.ts';
+import theme from './ide/components/codeEditor/theme.ts';
+export type * from './ide/types/index.d.ts';
+export type * from './ide/store/index.d.ts';
 
 export {
+  theme,
   useIdeStore,
   IdeComponent
-};
-export type {
-  IdeStore,
-  IdeProps,
-  theme
 };
