@@ -74,6 +74,7 @@ export default function CodeMirrorEditor({
         EditorState.allowMultipleSelections.of(false),
         autocompleteConfig.current.of(autocompletion(ideEventListener?.autocomplete
           ? {
+            interactionDelay: 200,
             override: [completionSource({
               getAutoComplate: ideEventListener.autocomplete,
               editor
