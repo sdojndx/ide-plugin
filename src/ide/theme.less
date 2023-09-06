@@ -35,7 +35,7 @@
             &::-webkit-scrollbar-thumb{
                 box-shadow: inset 0 0 0px @scrollShadowColor;
                 background-color: @scrollTrackColor;
-                border:1px solid  @labelColor;
+                border:1px solid  @scrollShadowColor;
             }
             &::-webkit-scrollbar-corner{
                 box-shadow: inset 0 0 0px @scrollShadowColor;
@@ -43,7 +43,7 @@
             }
         }
         .drag_side {
-            background-color: @sideColor;
+            background-color: transparent;
             position: absolute;
             &.drag_active{
                 background-color: @buttonBackgroundColor;
